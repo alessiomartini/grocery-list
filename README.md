@@ -26,9 +26,11 @@ In alternativa da riga di comando, una volta installato l'Android SDK:
 
 L'APK generato si trova in `app/build/outputs/apk/debug/`.
 
-### ⚠️ Nota sulla verifica in questo ambiente
+### Build automatica (CI)
 
-Questa sessione di sviluppo remoto **non ha accesso di rete** al repository Maven di Google (`dl.google.com`), quindi non è stato possibile eseguire una build Gradle completa né i test di compilazione in questo ambiente. Il codice è stato scritto e rivisto manualmente con attenzione, ma **ti consiglio di aprirlo in Android Studio e fare una prima build/lint prima di considerarlo definitivo** — è normale che possa servire qualche piccolo aggiustamento (versioni di libreria, importazioni) alla prima compilazione reale.
+Il workflow `.github/workflows/build-apk.yml` compila l'app e ne esegue i test su ogni push (su GitHub Actions, non nell'ambiente di sviluppo remoto usato per scrivere il codice, che non ha accesso all'Android SDK). Controlla la tab **Actions** del repository per lo stato della build.
+
+Quando fai push di un **tag `v*`** (es. `v1.1`), il workflow compila anche l'APK e lo pubblica automaticamente come GitHub Release con quel tag — è lo stesso meccanismo che alimenta il bottone "Controlla aggiornamenti" dell'app (vedi sotto).
 
 ## Configurare le ricette (API key Claude)
 
