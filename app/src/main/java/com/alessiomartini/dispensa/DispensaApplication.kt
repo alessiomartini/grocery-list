@@ -7,6 +7,7 @@ import androidx.work.WorkManager
 import com.alessiomartini.dispensa.data.AppDatabase
 import com.alessiomartini.dispensa.data.ItemRepository
 import com.alessiomartini.dispensa.network.RecipeSuggestionRepository
+import com.alessiomartini.dispensa.network.UpdateRepository
 import com.alessiomartini.dispensa.notifications.ExpiryCheckWorker
 import com.alessiomartini.dispensa.notifications.NotificationHelper
 import com.alessiomartini.dispensa.settings.SettingsRepository
@@ -20,6 +21,7 @@ class DispensaApplication : Application() {
     val recipeSuggestionRepository: RecipeSuggestionRepository by lazy {
         RecipeSuggestionRepository(settingsRepository)
     }
+    val updateRepository: UpdateRepository by lazy { UpdateRepository(this) }
 
     override fun onCreate() {
         super.onCreate()

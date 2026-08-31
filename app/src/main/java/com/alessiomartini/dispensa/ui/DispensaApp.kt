@@ -30,6 +30,7 @@ import com.alessiomartini.dispensa.ui.recipes.RecipesScreen
 import com.alessiomartini.dispensa.ui.recipes.RecipesViewModel
 import com.alessiomartini.dispensa.ui.settings.SettingsScreen
 import com.alessiomartini.dispensa.ui.settings.SettingsViewModel
+import com.alessiomartini.dispensa.ui.settings.UpdateViewModel
 
 private object Routes {
     const val LIST = "list"
@@ -105,7 +106,10 @@ fun DispensaApp(app: DispensaApplication) {
                 val viewModel: SettingsViewModel = viewModel(
                     factory = LambdaViewModelFactory { SettingsViewModel(app.settingsRepository) }
                 )
-                SettingsScreen(viewModel, onBack = { navController.popBackStack() })
+                val updateViewModel: UpdateViewModel = viewModel(
+                    factory = LambdaViewModelFactory { UpdateViewModel(app.updateRepository) }
+                )
+                SettingsScreen(viewModel, updateViewModel, onBack = { navController.popBackStack() })
             }
         }
     }

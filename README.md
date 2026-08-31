@@ -9,6 +9,7 @@ Pensata per sostituire il workflow "lista con spunte" di Google Keep: quando com
 - **Lista unica stile Keep**: sezione "Da comprare" e "In dispensa", con checkbox. Comprato → in dispensa (con scadenza opzionale). Finito → torna da comprare.
 - **Scadenze**: schermata dedicata con tutti i prodotti in dispensa che hanno una data di scadenza, ordinati ed evidenziati (scaduto / oggi / entro 3 giorni). Notifica push giornaliera se qualcosa sta per scadere.
 - **Ricette**: genera 3 idee di ricette in base a quello che hai in dispensa, usando l'API di Claude (Anthropic). Richiede una tua API key personale, inserita nelle Impostazioni.
+- **Aggiornamenti**: bottone in Impostazioni per controllare se è disponibile una versione più recente dell'app (pubblicata come Release su GitHub) e installarla, dato che l'app non è distribuita tramite Play Store.
 - Tutti i dati (lista, dispensa, scadenze) restano **sul dispositivo**, salvati con Room/SQLite. Nessun account, nessun cloud.
 
 ## Come compilare
@@ -36,6 +37,17 @@ Questa sessione di sviluppo remoto **non ha accesso di rete** al repository Mave
 3. La chiave viene salvata **solo sul telefono**, cifrata con `EncryptedSharedPreferences` (chiave di cifratura nell'Android Keystore), ed esclusa dai backup automatici. Viene usata solo per chiamare `api.anthropic.com` quando premi "Suggerisci ricette".
 
 Se non inserisci una chiave, tutto il resto dell'app (lista, dispensa, scadenze, notifiche) funziona comunque normalmente offline.
+
+## Pubblicare un aggiornamento
+
+Il bottone "Controlla aggiornamenti" nelle Impostazioni legge le [Release GitHub](https://github.com/alessiomartini/grocery-list/releases) di questo repository. Per pubblicare una nuova versione:
+
+1. Alza `versionName` (e `versionCode`) in `app/build.gradle.kts`.
+2. Genera l'APK firmato (`./gradlew assembleRelease`, oppure Build → Generate Signed App Bundle/APK in Android Studio).
+3. Su GitHub, crea una nuova Release con **tag uguale al nuovo `versionName`** (es. `v1.1`) e allega il file `.apk` come asset della release.
+4. Chi ha già installato l'app vedrà l'aggiornamento disponibile aprendo Impostazioni → "Controlla aggiornamenti".
+
+Al primo utilizzo, Android chiederà il permesso di installare app da questa sorgente (necessario perché l'app non viene dal Play Store): l'app apre automaticamente le impostazioni di sistema corrette se il permesso non è ancora stato concesso.
 
 ## Struttura del progetto
 

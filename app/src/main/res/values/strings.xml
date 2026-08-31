@@ -42,4 +42,15 @@
     <string name="settings_api_key_description">La chiave viene salvata solo su questo dispositivo, in forma cifrata, e usata unicamente per chiedere idee di ricette. Puoi crearne una su console.anthropic.com.</string>
     <string name="settings_model_title">Modello</string>
     <string name="settings_saved">Impostazioni salvate</string>
+
+    <string name="update_section_title">Aggiornamenti</string>
+    <string name="update_current_version">Versione installata: %1$s</string>
+    <string name="update_check_button">Controlla aggiornamenti</string>
+    <string name="update_checking">Controllo in corso…</string>
+    <string name="update_up_to_date">Hai già l\'ultima versione.</string>
+    <string name="update_available">Disponibile la versione %1$s.</string>
+    <string name="update_download_button">Scarica e installa</string>
+    <string name="update_downloading">Download in corso…</string>
+    <string name="update_ready_button">Installa ora</string>
+    <string name="update_error">Controllo aggiornamenti non riuscito: %1$s</string>
 </resources>
