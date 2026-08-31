@@ -1,107 +1,112 @@
 package com.alessiomartini.dispensa.data
 
+import java.time.LocalDate
+
 data class FoodCatalogItem(
     val name: String,
     val category: String,
     val icon: String,
+    /** Typical days from purchase until it goes bad, if known. Null for non-perishables. */
+    val shelfLifeDays: Int? = null,
     val extraKeywords: List<String> = emptyList()
 ) {
     val keywords: List<String> = (extraKeywords + name).map { it.lowercase() }.distinct()
 }
 
 /**
- * A small local list of common grocery items, used to guess an icon and category for whatever
- * the user types, and to surface "you might also need" suggestions. Matching is substring-based
- * on purpose (no NLP/network call) so it stays instant and works offline.
+ * A small local list of common grocery items, used to guess an icon, category, and typical
+ * expiry date for whatever the user types, and to surface "you might also need" suggestions.
+ * Matching is substring-based on purpose (no NLP/network call) so it stays instant and works
+ * offline.
  */
 object FoodCatalog {
 
     val items: List<FoodCatalogItem> = listOf(
         // Fruits and vegetables
-        FoodCatalogItem("Apple", "Fruits and vegetables", "🍎"),
-        FoodCatalogItem("Banana", "Fruits and vegetables", "🍌"),
-        FoodCatalogItem("Orange", "Fruits and vegetables", "🍊"),
-        FoodCatalogItem("Lemon", "Fruits and vegetables", "🍋"),
-        FoodCatalogItem("Grapes", "Fruits and vegetables", "🍇"),
-        FoodCatalogItem("Strawberry", "Fruits and vegetables", "🍓", listOf("strawberries")),
-        FoodCatalogItem("Watermelon", "Fruits and vegetables", "🍉"),
-        FoodCatalogItem("Pineapple", "Fruits and vegetables", "🍍"),
-        FoodCatalogItem("Avocado", "Fruits and vegetables", "🥑"),
-        FoodCatalogItem("Tomato", "Fruits and vegetables", "🍅", listOf("tomatoes")),
-        FoodCatalogItem("Potato", "Fruits and vegetables", "🥔", listOf("potatoes")),
-        FoodCatalogItem("Carrot", "Fruits and vegetables", "🥕", listOf("carrots")),
-        FoodCatalogItem("Onion", "Fruits and vegetables", "🧅", listOf("onions")),
-        FoodCatalogItem("Garlic", "Fruits and vegetables", "🧄"),
-        FoodCatalogItem("Broccoli", "Fruits and vegetables", "🥦"),
-        FoodCatalogItem("Lettuce", "Fruits and vegetables", "🥬", listOf("salad greens")),
-        FoodCatalogItem("Cucumber", "Fruits and vegetables", "🥒"),
-        FoodCatalogItem("Bell pepper", "Fruits and vegetables", "🫑", listOf("peppers")),
-        FoodCatalogItem("Mushroom", "Fruits and vegetables", "🍄", listOf("mushrooms")),
-        FoodCatalogItem("Corn", "Fruits and vegetables", "🌽"),
+        FoodCatalogItem("Apple", "Fruits and vegetables", "🍎", 21),
+        FoodCatalogItem("Banana", "Fruits and vegetables", "🍌", 5),
+        FoodCatalogItem("Orange", "Fruits and vegetables", "🍊", 14),
+        FoodCatalogItem("Lemon", "Fruits and vegetables", "🍋", 21),
+        FoodCatalogItem("Grapes", "Fruits and vegetables", "🍇", 7),
+        FoodCatalogItem("Strawberry", "Fruits and vegetables", "🍓", 4, listOf("strawberries")),
+        FoodCatalogItem("Watermelon", "Fruits and vegetables", "🍉", 7),
+        FoodCatalogItem("Pineapple", "Fruits and vegetables", "🍍", 5),
+        FoodCatalogItem("Avocado", "Fruits and vegetables", "🥑", 5),
+        FoodCatalogItem("Tomato", "Fruits and vegetables", "🍅", 7, listOf("tomatoes")),
+        FoodCatalogItem("Potato", "Fruits and vegetables", "🥔", 30, listOf("potatoes")),
+        FoodCatalogItem("Carrot", "Fruits and vegetables", "🥕", 21, listOf("carrots")),
+        FoodCatalogItem("Onion", "Fruits and vegetables", "🧅", 30, listOf("onions")),
+        FoodCatalogItem("Garlic", "Fruits and vegetables", "🧄", 60),
+        FoodCatalogItem("Broccoli", "Fruits and vegetables", "🥦", 5),
+        FoodCatalogItem("Lettuce", "Fruits and vegetables", "🥬", 5, listOf("salad greens")),
+        FoodCatalogItem("Cucumber", "Fruits and vegetables", "🥒", 7),
+        FoodCatalogItem("Bell pepper", "Fruits and vegetables", "🫑", 10, listOf("peppers")),
+        FoodCatalogItem("Mushroom", "Fruits and vegetables", "🍄", 5, listOf("mushrooms")),
+        FoodCatalogItem("Corn", "Fruits and vegetables", "🌽", 3),
 
         // Dairy and eggs
-        FoodCatalogItem("Milk", "Dairy and eggs", "🥛"),
-        FoodCatalogItem("Eggs", "Dairy and eggs", "🥚", listOf("egg")),
-        FoodCatalogItem("Cheese", "Dairy and eggs", "🧀"),
-        FoodCatalogItem("Butter", "Dairy and eggs", "🧈"),
-        FoodCatalogItem("Yogurt", "Dairy and eggs", "🥣", listOf("yoghurt")),
-        FoodCatalogItem("Cream", "Dairy and eggs", "🥛"),
+        FoodCatalogItem("Milk", "Dairy and eggs", "🥛", 7),
+        FoodCatalogItem("Eggs", "Dairy and eggs", "🥚", 21, listOf("egg")),
+        FoodCatalogItem("Cheese", "Dairy and eggs", "🧀", 30),
+        FoodCatalogItem("Butter", "Dairy and eggs", "🧈", 60),
+        FoodCatalogItem("Yogurt", "Dairy and eggs", "🥣", 14, listOf("yoghurt")),
+        FoodCatalogItem("Cream", "Dairy and eggs", "🥛", 10),
 
         // Meat and fish
-        FoodCatalogItem("Chicken", "Meat and fish", "🍗"),
-        FoodCatalogItem("Beef", "Meat and fish", "🥩"),
-        FoodCatalogItem("Pork", "Meat and fish", "🥓"),
-        FoodCatalogItem("Bacon", "Meat and fish", "🥓"),
-        FoodCatalogItem("Fish", "Meat and fish", "🐟"),
-        FoodCatalogItem("Salmon", "Meat and fish", "🐟"),
-        FoodCatalogItem("Shrimp", "Meat and fish", "🍤", listOf("prawns")),
-        FoodCatalogItem("Sausage", "Meat and fish", "🌭", listOf("sausages")),
-        FoodCatalogItem("Ham", "Meat and fish", "🍖"),
+        FoodCatalogItem("Chicken", "Meat and fish", "🍗", 2),
+        FoodCatalogItem("Beef", "Meat and fish", "🥩", 3),
+        FoodCatalogItem("Pork", "Meat and fish", "🥓", 3),
+        FoodCatalogItem("Bacon", "Meat and fish", "🥓", 7),
+        FoodCatalogItem("Fish", "Meat and fish", "🐟", 2),
+        FoodCatalogItem("Salmon", "Meat and fish", "🐟", 2),
+        FoodCatalogItem("Shrimp", "Meat and fish", "🍤", 2, listOf("prawns")),
+        FoodCatalogItem("Sausage", "Meat and fish", "🌭", 7, listOf("sausages")),
+        FoodCatalogItem("Ham", "Meat and fish", "🍖", 5),
 
         // Bread and cereals
-        FoodCatalogItem("Bread", "Bread and cereals", "🍞"),
-        FoodCatalogItem("Pasta", "Bread and cereals", "🍝"),
-        FoodCatalogItem("Rice", "Bread and cereals", "🍚"),
-        FoodCatalogItem("Cereal", "Bread and cereals", "🥣", listOf("cereals")),
-        FoodCatalogItem("Oats", "Bread and cereals", "🌾", listOf("oatmeal")),
-        FoodCatalogItem("Flour", "Bread and cereals", "🌾"),
-        FoodCatalogItem("Bagel", "Bread and cereals", "🥯", listOf("bagels")),
-        FoodCatalogItem("Croissant", "Bread and cereals", "🥐", listOf("croissants")),
+        FoodCatalogItem("Bread", "Bread and cereals", "🍞", 5),
+        FoodCatalogItem("Pasta", "Bread and cereals", "🍝", 365),
+        FoodCatalogItem("Rice", "Bread and cereals", "🍚", 365),
+        FoodCatalogItem("Cereal", "Bread and cereals", "🥣", 180, listOf("cereals")),
+        FoodCatalogItem("Oats", "Bread and cereals", "🌾", 180, listOf("oatmeal")),
+        FoodCatalogItem("Flour", "Bread and cereals", "🌾", 180),
+        FoodCatalogItem("Bagel", "Bread and cereals", "🥯", 5, listOf("bagels")),
+        FoodCatalogItem("Croissant", "Bread and cereals", "🥐", 3, listOf("croissants")),
 
         // Pantry staples
-        FoodCatalogItem("Salt", "Pantry staples", "🧂"),
-        FoodCatalogItem("Sugar", "Pantry staples", "🍯"),
-        FoodCatalogItem("Olive oil", "Pantry staples", "🫒", listOf("cooking oil")),
-        FoodCatalogItem("Vinegar", "Pantry staples", "🍶"),
-        FoodCatalogItem("Honey", "Pantry staples", "🍯"),
-        FoodCatalogItem("Canned tomatoes", "Pantry staples", "🥫"),
-        FoodCatalogItem("Beans", "Pantry staples", "🥫"),
-        FoodCatalogItem("Jam", "Pantry staples", "🍓", listOf("marmalade")),
-        FoodCatalogItem("Peanut butter", "Pantry staples", "🥜"),
+        FoodCatalogItem("Salt", "Pantry staples", "🧂", 1825),
+        FoodCatalogItem("Sugar", "Pantry staples", "🍯", 730),
+        FoodCatalogItem("Olive oil", "Pantry staples", "🫒", 365, listOf("cooking oil")),
+        FoodCatalogItem("Vinegar", "Pantry staples", "🍶", 730),
+        FoodCatalogItem("Honey", "Pantry staples", "🍯", 1825),
+        FoodCatalogItem("Canned tomatoes", "Pantry staples", "🥫", 730),
+        FoodCatalogItem("Beans", "Pantry staples", "🥫", 730),
+        FoodCatalogItem("Jam", "Pantry staples", "🍓", 365, listOf("marmalade")),
+        FoodCatalogItem("Peanut butter", "Pantry staples", "🥜", 180),
 
         // Frozen foods
-        FoodCatalogItem("Ice cream", "Frozen foods", "🍦"),
-        FoodCatalogItem("Frozen pizza", "Frozen foods", "🍕"),
-        FoodCatalogItem("Frozen vegetables", "Frozen foods", "🧊"),
+        FoodCatalogItem("Ice cream", "Frozen foods", "🍦", 90),
+        FoodCatalogItem("Frozen pizza", "Frozen foods", "🍕", 180),
+        FoodCatalogItem("Frozen vegetables", "Frozen foods", "🧊", 270),
 
         // Beverages
-        FoodCatalogItem("Water", "Beverages", "💧"),
-        FoodCatalogItem("Juice", "Beverages", "🧃"),
-        FoodCatalogItem("Coffee", "Beverages", "☕"),
-        FoodCatalogItem("Tea", "Beverages", "🍵"),
-        FoodCatalogItem("Wine", "Beverages", "🍷"),
-        FoodCatalogItem("Beer", "Beverages", "🍺"),
-        FoodCatalogItem("Soda", "Beverages", "🥤", listOf("soft drink", "pop")),
+        FoodCatalogItem("Water", "Beverages", "💧", 365),
+        FoodCatalogItem("Juice", "Beverages", "🧃", 14),
+        FoodCatalogItem("Coffee", "Beverages", "☕", 180),
+        FoodCatalogItem("Tea", "Beverages", "🍵", 365),
+        FoodCatalogItem("Wine", "Beverages", "🍷", 1825),
+        FoodCatalogItem("Beer", "Beverages", "🍺", 180),
+        FoodCatalogItem("Soda", "Beverages", "🥤", 180, listOf("soft drink", "pop")),
 
-        // Household and hygiene
+        // Household and hygiene (non-perishable: no shelf life)
         FoodCatalogItem("Toilet paper", "Household and hygiene", "🧻"),
         FoodCatalogItem("Paper towels", "Household and hygiene", "🧻"),
         FoodCatalogItem("Dish soap", "Household and hygiene", "🧴"),
         FoodCatalogItem("Laundry detergent", "Household and hygiene", "🧴"),
         FoodCatalogItem("Toothpaste", "Household and hygiene", "🪥"),
         FoodCatalogItem("Shampoo", "Household and hygiene", "🧴"),
-        FoodCatalogItem("Trash bags", "Household and hygiene", "🗑️", listOf("garbage bags")),
-        FoodCatalogItem("Sponge", "Household and hygiene", "🧽", listOf("sponges"))
+        FoodCatalogItem("Trash bags", "Household and hygiene", "🗑️", extraKeywords = listOf("garbage bags")),
+        FoodCatalogItem("Sponge", "Household and hygiene", "🧽", extraKeywords = listOf("sponges"))
     )
 
     private const val DEFAULT_ICON = "🛒"
@@ -115,6 +120,18 @@ object FoodCatalog {
         "Frozen foods" to "🧊",
         "Beverages" to "🥤",
         "Household and hygiene" to "🧴"
+    )
+
+    /** Fallback shelf life (days) by category, used when the exact item isn't in the catalog. */
+    private val categoryDefaultShelfLifeDays = mapOf(
+        "Fruits and vegetables" to 7,
+        "Dairy and eggs" to 10,
+        "Meat and fish" to 3,
+        "Bread and cereals" to 14,
+        "Pantry staples" to 180,
+        "Frozen foods" to 120,
+        "Beverages" to 180
+        // Household and hygiene, Other: no sensible default, left unmapped.
     )
 
     /** Best catalog match for a (possibly multi-word) item name the user typed, if any. */
@@ -134,6 +151,18 @@ object FoodCatalog {
     }
 
     fun categoryFor(itemName: String): String? = find(itemName)?.category
+
+    /**
+     * A sensible default expiry date for [itemName], based on its typical shelf life (or its
+     * category's, if the exact item isn't in the catalog). Null means "don't suggest one" -
+     * either nothing matched, or the item doesn't meaningfully expire.
+     */
+    fun suggestedExpiryDate(itemName: String, category: String? = null, from: LocalDate = LocalDate.now()): LocalDate? {
+        val shelfLifeDays = find(itemName)?.shelfLifeDays
+            ?: category?.let { categoryDefaultShelfLifeDays[it] }
+            ?: return null
+        return from.plusDays(shelfLifeDays.toLong())
+    }
 
     /** Catalog entries whose name/keywords contain [query], for autocomplete while typing. */
     fun suggestions(query: String, limit: Int = 6): List<FoodCatalogItem> {

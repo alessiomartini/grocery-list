@@ -7,7 +7,7 @@ Pensata per sostituire il workflow "lista con spunte" di Google Keep: quando com
 ## Funzionalità
 
 - **Lista unica stile Keep**: sezione "Da comprare" e "In dispensa", con checkbox. Comprato → in dispensa (con scadenza opzionale). Finito → torna da comprare.
-- **Scadenze**: schermata dedicata con tutti i prodotti in dispensa che hanno una data di scadenza, ordinati ed evidenziati (scaduto / oggi / entro 3 giorni). Notifica push giornaliera se qualcosa sta per scadere.
+- **Scadenze**: schermata dedicata con tutti i prodotti in dispensa che hanno una data di scadenza, ordinati ed evidenziati (scaduto / oggi / entro 3 giorni). Notifica push giornaliera se qualcosa sta per scadere. Quando spunti un articolo come comprato, la data viene **precompilata automaticamente** in base al tipo di alimento (es. latte ~7 giorni, pasta ~1 anno, pollo fresco ~2 giorni) — resta comunque modificabile o rimovibile.
 - **Ricette**: genera 3 idee di ricette in base a quello che hai in dispensa, usando l'API di Claude (Anthropic). Richiede una tua API key personale, inserita nelle Impostazioni.
 - **Aggiornamenti**: bottone in Impostazioni per controllare se è disponibile una versione più recente dell'app (pubblicata come Release su GitHub) e installarla, dato che l'app non è distribuita tramite Play Store.
 - Tutti i dati (lista, dispensa, scadenze) restano **sul dispositivo**, salvati con Room/SQLite. Nessun account, nessun cloud.

@@ -13,13 +13,21 @@ import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneOffset
 
+/**
+ * @param initialDate what "Cancel"/dismiss reverts to - the date as it was before this dialog
+ *   opened (null if the item had none yet).
+ * @param preselectedDate what the picker shows pre-selected when it opens; defaults to
+ *   [initialDate], but callers offering an auto-suggested date (not yet actually set) pass it
+ *   here separately so cancelling doesn't silently apply it.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ExpiryDatePickerDialog(
     initialDate: LocalDate?,
+    preselectedDate: LocalDate? = initialDate,
     onDismiss: (LocalDate?) -> Unit
 ) {
-    val initialMillis = initialDate?.atStartOfDay(ZoneOffset.UTC)?.toInstant()?.toEpochMilli()
+    val initialMillis = preselectedDate?.atStartOfDay(ZoneOffset.UTC)?.toInstant()?.toEpochMilli()
     val datePickerState = rememberDatePickerState(initialSelectedDateMillis = initialMillis)
 
     DatePickerDialog(

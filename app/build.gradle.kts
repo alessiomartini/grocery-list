@@ -14,8 +14,8 @@ android {
         applicationId = "com.alessiomartini.dispensa"
         minSdk = 26
         targetSdk = 34
-        versionCode = 3
-        versionName = "1.2"
+        versionCode = 4
+        versionName = "1.3"
 
         buildConfigField("String", "GITHUB_REPO", "\"alessiomartini/grocery-list\"")
 

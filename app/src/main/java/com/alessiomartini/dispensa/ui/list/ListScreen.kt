@@ -127,7 +127,8 @@ fun ListScreen(viewModel: ListViewModel, onSettingsClick: () -> Unit) {
     }
 
     itemPendingExpiry?.let { pendingItem ->
-        ExpiryDatePickerDialog(initialDate = null) { date ->
+        val suggestedDate = FoodCatalog.suggestedExpiryDate(pendingItem.name, pendingItem.category)
+        ExpiryDatePickerDialog(initialDate = null, preselectedDate = suggestedDate) { date ->
             viewModel.markAsBought(pendingItem, date)
             itemPendingExpiry = null
         }
