@@ -105,21 +105,21 @@ private fun RecipeList(recipes: List<RecipeSuggestion>) {
 private fun RecipeCard(recipe: RecipeSuggestion) {
     Card(modifier = Modifier.fillMaxWidth()) {
         Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-            Text(recipe.titolo, style = androidx.compose.material3.MaterialTheme.typography.titleMedium)
+            Text(recipe.title, style = androidx.compose.material3.MaterialTheme.typography.titleMedium)
 
-            if (recipe.ingredientiUsati.isNotEmpty()) {
+            if (recipe.ingredientsUsed.isNotEmpty()) {
                 Text(
-                    "Usa: " + recipe.ingredientiUsati.joinToString(", "),
+                    stringResource(R.string.recipes_uses, recipe.ingredientsUsed.joinToString(", ")),
                     style = androidx.compose.material3.MaterialTheme.typography.bodyMedium
                 )
             }
-            if (recipe.ingredientiMancanti.isNotEmpty()) {
+            if (recipe.missingIngredients.isNotEmpty()) {
                 Text(
-                    "Ti serve anche: " + recipe.ingredientiMancanti.joinToString(", "),
+                    stringResource(R.string.recipes_missing_ingredients, recipe.missingIngredients.joinToString(", ")),
                     style = androidx.compose.material3.MaterialTheme.typography.bodySmall
                 )
             }
-            recipe.preparazione.forEachIndexed { index, step ->
+            recipe.steps.forEachIndexed { index, step ->
                 Text("${index + 1}. $step", style = androidx.compose.material3.MaterialTheme.typography.bodyMedium)
             }
         }

@@ -45,7 +45,7 @@ class UpdateRepository(private val context: Context) {
             client.newCall(request).execute().use { response ->
                 if (!response.isSuccessful) {
                     return@withContext if (response.code == 404) {
-                        UpdateCheckResult.Error("Nessuna release pubblicata su GitHub")
+                        UpdateCheckResult.Error("No release has been published on GitHub yet")
                     } else {
                         UpdateCheckResult.Error("HTTP ${response.code}")
                     }
@@ -57,7 +57,7 @@ class UpdateRepository(private val context: Context) {
                 )
                 val remoteVersion = release.tag_name.removePrefix("v")
                 val apkAsset = release.assets.firstOrNull { it.name.endsWith(".apk") }
-                    ?: return@withContext UpdateCheckResult.Error("La release più recente non contiene un file .apk")
+                    ?: return@withContext UpdateCheckResult.Error("The latest release doesn't have an .apk file attached")
 
                 if (isNewerVersion(remoteVersion, BuildConfig.VERSION_NAME)) {
                     UpdateCheckResult.Available(
@@ -70,19 +70,19 @@ class UpdateRepository(private val context: Context) {
                 }
             }
         } catch (e: IOException) {
-            UpdateCheckResult.Error(e.message ?: "Errore di rete")
+            UpdateCheckResult.Error(e.message ?: "Network error")
         } catch (e: Exception) {
-            UpdateCheckResult.Error(e.message ?: "Errore imprevisto")
+            UpdateCheckResult.Error(e.message ?: "Unexpected error")
         }
     }
 
     suspend fun downloadApk(url: String): File = withContext(Dispatchers.IO) {
         val request = Request.Builder().url(url).build()
         client.newCall(request).execute().use { response ->
-            if (!response.isSuccessful) throw IOException("Download fallito: HTTP ${response.code}")
+            if (!response.isSuccessful) throw IOException("Download failed: HTTP ${response.code}")
             val updatesDir = File(context.cacheDir, "updates").apply { mkdirs() }
-            val apkFile = File(updatesDir, "dispensa-update.apk")
-            val body = response.body ?: throw IOException("Corpo della risposta vuoto")
+            val apkFile = File(updatesDir, "pantry-update.apk")
+            val body = response.body ?: throw IOException("Empty response body")
             body.byteStream().use { input ->
                 apkFile.outputStream().use { output -> input.copyTo(output) }
             }

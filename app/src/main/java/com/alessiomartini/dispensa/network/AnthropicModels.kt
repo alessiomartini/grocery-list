@@ -35,8 +35,8 @@ data class AnthropicError(
 
 @Serializable
 data class RecipeSuggestion(
-    val titolo: String,
-    val ingredientiUsati: List<String> = emptyList(),
-    val ingredientiMancanti: List<String> = emptyList(),
-    val preparazione: List<String> = emptyList()
+    val title: String,
+    val ingredientsUsed: List<String> = emptyList(),
+    val missingIngredients: List<String> = emptyList(),
+    val steps: List<String> = emptyList()
 )

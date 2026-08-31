@@ -63,15 +63,15 @@ class RecipeSuggestionRepository(
 
                     val parsed = json.decodeFromString(AnthropicResponse.serializer(), bodyString)
                     val text = parsed.content.firstOrNull { it.type == "text" }?.text
-                        ?: return@withContext RecipeResult.Error("Risposta vuota dal modello")
+                        ?: return@withContext RecipeResult.Error("Empty response from the model")
 
                     val recipes = parseRecipes(text)
                     RecipeResult.Success(recipes)
                 }
             } catch (e: IOException) {
-                RecipeResult.Error(e.message ?: "Errore di rete")
+                RecipeResult.Error(e.message ?: "Network error")
             } catch (e: Exception) {
-                RecipeResult.Error(e.message ?: "Errore imprevisto")
+                RecipeResult.Error(e.message ?: "Unexpected error")
             }
         }
 
@@ -91,17 +91,17 @@ class RecipeSuggestionRepository(
     private fun buildPrompt(pantryItemNames: List<String>): String {
         val ingredients = pantryItemNames.joinToString(", ")
         return """
-            Ho questi ingredienti in dispensa: $ingredients.
+            I have these ingredients at home: $ingredients.
 
-            Suggeriscimi 3 ricette semplici che posso preparare usando principalmente questi ingredienti
-            (posso usare anche sale, pepe, olio, acqua che do per scontati). Rispondi SOLO con un array
-            JSON valido (nessun testo prima o dopo, niente markdown), dove ogni elemento ha questi campi:
-            - "titolo": nome della ricetta (string)
-            - "ingredientiUsati": ingredienti della dispensa usati in questa ricetta (array di string)
-            - "ingredientiMancanti": eventuali ingredienti che servono e non ho in dispensa (array di string, puo' essere vuoto)
-            - "preparazione": passaggi della preparazione, brevi (array di string)
+            Suggest 3 simple recipes I can make mostly with these ingredients (I can also use
+            salt, pepper, oil, and water, which you can assume I have). Reply with ONLY a valid
+            JSON array (no text before or after, no markdown), where each element has these fields:
+            - "title": the recipe's name (string)
+            - "ingredientsUsed": ingredients from my list used in this recipe (array of strings)
+            - "missingIngredients": any ingredients the recipe needs that I don't have (array of strings, can be empty)
+            - "steps": short preparation steps (array of strings)
 
-            Scrivi tutto in italiano.
+            Write everything in English.
         """.trimIndent()
     }
 

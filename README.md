@@ -1,6 +1,6 @@
-# Dispensa
+# Pantry
 
-App Android nativa (Kotlin + Jetpack Compose) per gestire la spesa di casa: cosa comprare, cosa hai già in dispensa, quando scadono i prodotti e idee di ricette con quello che hai a disposizione.
+App Android nativa (Kotlin + Jetpack Compose, interfaccia in inglese) per gestire la spesa di casa: cosa comprare, cosa hai già in dispensa, quando scadono i prodotti e idee di ricette con quello che hai a disposizione.
 
 Pensata per sostituire il workflow "lista con spunte" di Google Keep: quando compri un prodotto lo spunti (passa in dispensa), quando lo finisci lo spunti di nuovo (torna nella lista della spesa). A differenza di Keep, i dati sono salvati in un database locale sul telefono e non si perdono per una sincronizzazione andata male.
 

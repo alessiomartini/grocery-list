@@ -43,7 +43,7 @@ class UpdateViewModel(private val updateRepository: UpdateRepository) : ViewMode
             _uiState.value = try {
                 UpdateUiState.ReadyToInstall(updateRepository.downloadApk(downloadUrl))
             } catch (e: Exception) {
-                UpdateUiState.Error(e.message ?: "Download fallito")
+                UpdateUiState.Error(e.message ?: "Download failed")
             }
         }
     }
