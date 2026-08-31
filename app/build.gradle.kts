@@ -14,12 +14,24 @@ android {
         applicationId = "com.alessiomartini.dispensa"
         minSdk = 26
         targetSdk = 34
-        versionCode = 2
-        versionName = "1.1"
+        versionCode = 3
+        versionName = "1.2"
 
         buildConfigField("String", "GITHUB_REPO", "\"alessiomartini/grocery-list\"")
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    signingConfigs {
+        getByName("debug") {
+            // Committed on purpose: this app is side-loaded (not on the Play Store), so every
+            // build - CI or local - must sign with the same key or Android refuses to install
+            // a new version over an older one ("package conflicts with an existing package").
+            storeFile = file("keystore/pantry.keystore")
+            storePassword = "pantryupdates"
+            keyAlias = "pantry"
+            keyPassword = "pantryupdates"
+        }
     }
 
     buildTypes {

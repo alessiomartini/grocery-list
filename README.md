@@ -51,6 +51,12 @@ Il bottone "Controlla aggiornamenti" nelle Impostazioni legge le [Release GitHub
 
 Al primo utilizzo, Android chiederà il permesso di installare app da questa sorgente (necessario perché l'app non viene dal Play Store): l'app apre automaticamente le impostazioni di sistema corrette se il permesso non è ancora stato concesso.
 
+### Firma dell'APK
+
+Ogni build (CI o locale) firma l'APK con il keystore committato in `app/keystore/pantry.keystore` (password/alias in `app/build.gradle.kts`). È necessario perché Android rifiuta di installare un aggiornamento se la firma non coincide con quella già installata ("package conflicts with an existing package") — con una firma fissa, tutte le versioni pubblicate da qui in poi si aggiornano correttamente le une sulle altre. Non è un keystore di produzione/Play Store: va bene per un'app a uso personale distribuita fuori dallo store, non andrebbe usato così per un'app pubblicata pubblicamente.
+
+Le versioni precedenti a **1.2** erano firmate con una chiave di debug generata a caso a ogni build CI: se hai installato una di quelle, disinstalla l'app prima di installare la 1.2 (un'unica volta) — dopodiché gli aggiornamenti torneranno a funzionare in-place.
+
 ## Struttura del progetto
 
 ```
