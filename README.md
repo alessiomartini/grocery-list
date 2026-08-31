@@ -28,7 +28,7 @@ L'APK generato si trova in `app/build/outputs/apk/debug/`.
 
 ### Build automatica (CI)
 
-Il workflow `.github/workflows/build-apk.yml` compila l'app e ne esegue i test su ogni push (su GitHub Actions, non nell'ambiente di sviluppo remoto usato per scrivere il codice, che non ha accesso all'Android SDK). Controlla la tab **Actions** del repository per lo stato della build.
+Il workflow `.github/workflows/build-apk.yml` compila l'app e ne esegue i test su ogni push, su GitHub Actions — non nell'ambiente di sviluppo remoto usato per scrivere il codice, che non ha accesso all'Android SDK. È così che il codice viene verificato: [![Build APK](https://github.com/alessiomartini/grocery-list/actions/workflows/build-apk.yml/badge.svg)](https://github.com/alessiomartini/grocery-list/actions/workflows/build-apk.yml)
 
 Quando fai push di un **tag `v*`** (es. `v1.1`), il workflow compila anche l'APK e lo pubblica automaticamente come GitHub Release con quel tag — è lo stesso meccanismo che alimenta il bottone "Controlla aggiornamenti" dell'app (vedi sotto).
 
@@ -45,8 +45,8 @@ Se non inserisci una chiave, tutto il resto dell'app (lista, dispensa, scadenze,
 Il bottone "Controlla aggiornamenti" nelle Impostazioni legge le [Release GitHub](https://github.com/alessiomartini/grocery-list/releases) di questo repository. Per pubblicare una nuova versione:
 
 1. Alza `versionName` (e `versionCode`) in `app/build.gradle.kts`.
-2. Genera l'APK firmato (`./gradlew assembleRelease`, oppure Build → Generate Signed App Bundle/APK in Android Studio).
-3. Su GitHub, crea una nuova Release con **tag uguale al nuovo `versionName`** (es. `v1.1`) e allega il file `.apk` come asset della release.
+2. Fai push di un tag **uguale al nuovo `versionName`, con prefisso `v`** (es. `v1.1`): `git tag v1.1 && git push origin v1.1`.
+3. Il workflow `build-apk.yml` compila l'APK e crea automaticamente la Release GitHub con quel tag, allegando l'apk.
 4. Chi ha già installato l'app vedrà l'aggiornamento disponibile aprendo Impostazioni → "Controlla aggiornamenti".
 
 Al primo utilizzo, Android chiederà il permesso di installare app da questa sorgente (necessario perché l'app non viene dal Play Store): l'app apre automaticamente le impostazioni di sistema corrette se il permesso non è ancora stato concesso.
