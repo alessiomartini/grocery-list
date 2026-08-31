@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="green_primary">#2E7D32</color>
+    <color name="green_primary_container">#C8E6C9</color>
+    <color name="orange_warning">#F57C00</color>
+    <color name="red_expired">#C62828</color>
+    <color name="background_light">#FBFDF7</color>
+    <color name="background_dark">#1A1C18</color>
+</resources>
