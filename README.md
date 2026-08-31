@@ -8,7 +8,7 @@ Pensata per sostituire il workflow "lista con spunte" di Google Keep: quando com
 
 - **Lista unica stile Keep**: sezione "Da comprare" e "In dispensa", con checkbox. Comprato → in dispensa (con scadenza opzionale). Finito → torna da comprare.
 - **Scadenze**: schermata dedicata con tutti i prodotti in dispensa che hanno una data di scadenza, ordinati ed evidenziati (scaduto / oggi / entro 3 giorni). Notifica push giornaliera se qualcosa sta per scadere. Quando spunti un articolo come comprato, la data viene **precompilata automaticamente** in base al tipo di alimento (es. latte ~7 giorni, pasta ~1 anno, pollo fresco ~2 giorni) — resta comunque modificabile o rimovibile.
-- **Ricette**: genera 3 idee di ricette in base a quello che hai in dispensa, usando l'API di Claude (Anthropic). Richiede una tua API key personale, inserita nelle Impostazioni.
+- **Ricette**: genera 3 idee di ricette in base a quello che hai in dispensa, usando l'API di Gemini (Google), che ha un piano gratuito. Richiede una tua API key personale, inserita nelle Impostazioni.
 - **Aggiornamenti**: bottone in Impostazioni per controllare se è disponibile una versione più recente dell'app (pubblicata come Release su GitHub) e installarla, dato che l'app non è distribuita tramite Play Store.
 - Tutti i dati (lista, dispensa, scadenze) restano **sul dispositivo**, salvati con Room/SQLite. Nessun account, nessun cloud.
 
@@ -32,11 +32,15 @@ Il workflow `.github/workflows/build-apk.yml` compila l'app e ne esegue i test s
 
 Quando fai push di un **tag `v*`** (es. `v1.1`), il workflow compila anche l'APK e lo pubblica automaticamente come GitHub Release con quel tag — è lo stesso meccanismo che alimenta il bottone "Controlla aggiornamenti" dell'app (vedi sotto).
 
-## Configurare le ricette (API key Claude)
+## Configurare le ricette (API key Gemini, gratuita)
 
-1. Crea una API key su [console.anthropic.com](https://console.anthropic.com).
+1. Crea una API key gratuita su [aistudio.google.com/apikey](https://aistudio.google.com/apikey) (basta un account Google, nessuna carta di credito).
 2. Apri l'app → icona ingranaggio (Impostazioni) → incolla la chiave.
-3. La chiave viene salvata **solo sul telefono**, cifrata con `EncryptedSharedPreferences` (chiave di cifratura nell'Android Keystore), ed esclusa dai backup automatici. Viene usata solo per chiamare `api.anthropic.com` quando premi "Suggerisci ricette".
+3. La chiave viene salvata **solo sul telefono**, cifrata con `EncryptedSharedPreferences` (chiave di cifratura nell'Android Keystore), ed esclusa dai backup automatici. Viene usata solo per chiamare `generativelanguage.googleapis.com` quando premi "Suggest recipes".
+
+Il modello di default è `gemini-2.0-flash`; puoi cambiarlo nel campo "Model" nelle Impostazioni se Google ne rilascia uno più recente sul piano gratuito.
+
+⚠️ Sul piano gratuito di Gemini, Google può usare i prompt inviati per migliorare i propri modelli (diversamente dal piano a pagamento). Per una richiesta come "questi sono gli ingredienti che ho in dispensa" non è un problema serio, ma è bene saperlo.
 
 Se non inserisci una chiave, tutto il resto dell'app (lista, dispensa, scadenze, notifiche) funziona comunque normalmente offline.
 
@@ -63,7 +67,7 @@ Le versioni precedenti a **1.2** erano firmate con una chiave di debug generata 
 app/src/main/java/com/alessiomartini/dispensa/
 ├── data/            Entity Room, DAO, database, repository della dispensa
 ├── settings/         Salvataggio cifrato della API key
-├── network/           Chiamata all'API Claude per le ricette
+├── network/           Chiamata all'API Gemini per le ricette
 ├── notifications/     Worker giornaliero + notifiche di scadenza
 └── ui/
     ├── list/          Schermata "Lista" (checklist da comprare / in dispensa)

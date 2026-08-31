@@ -17,6 +17,11 @@ sealed interface RecipeResult {
     data class Error(val message: String) : RecipeResult
 }
 
+/**
+ * Uses the Gemini API (Google AI Studio) to suggest recipes, since it has a genuinely free tier
+ * for personal-scale use - see console.aistudio.google.com. Same JSON-array response contract
+ * as before; only the request/response shape and endpoint are Gemini-specific.
+ */
 class RecipeSuggestionRepository(
     private val settingsRepository: SettingsRepository
 ) {
@@ -35,18 +40,19 @@ class RecipeSuggestionRepository(
 
             val prompt = buildPrompt(pantryItemNames)
             val requestBody = json.encodeToString(
-                AnthropicRequest.serializer(),
-                AnthropicRequest(
-                    model = settings.model,
-                    max_tokens = 1500,
-                    messages = listOf(AnthropicMessage(role = "user", content = prompt))
+                GeminiRequest.serializer(),
+                GeminiRequest(
+                    contents = listOf(GeminiContent(role = "user", parts = listOf(GeminiPart(prompt)))),
+                    generationConfig = GeminiGenerationConfig(
+                        maxOutputTokens = 1500,
+                        responseMimeType = "application/json"
+                    )
                 )
             )
 
             val request = Request.Builder()
-                .url(ANTHROPIC_API_URL)
-                .addHeader("x-api-key", settings.apiKey)
-                .addHeader("anthropic-version", "2023-06-01")
+                .url("$GEMINI_API_BASE_URL/${settings.model}:generateContent")
+                .addHeader("x-goog-api-key", settings.apiKey)
                 .addHeader("content-type", "application/json")
                 .post(requestBody.toRequestBody(jsonMediaType))
                 .build()
@@ -56,13 +62,13 @@ class RecipeSuggestionRepository(
                     val bodyString = response.body?.string().orEmpty()
                     if (!response.isSuccessful) {
                         val message = runCatching {
-                            json.decodeFromString(AnthropicResponse.serializer(), bodyString).error?.message
+                            json.decodeFromString(GeminiResponse.serializer(), bodyString).error?.message
                         }.getOrNull() ?: "HTTP ${response.code}"
                         return@withContext RecipeResult.Error(message)
                     }
 
-                    val parsed = json.decodeFromString(AnthropicResponse.serializer(), bodyString)
-                    val text = parsed.content.firstOrNull { it.type == "text" }?.text
+                    val parsed = json.decodeFromString(GeminiResponse.serializer(), bodyString)
+                    val text = parsed.candidates.firstOrNull()?.content?.parts?.firstOrNull()?.text
                         ?: return@withContext RecipeResult.Error("Empty response from the model")
 
                     val recipes = parseRecipes(text)
@@ -106,6 +112,6 @@ class RecipeSuggestionRepository(
     }
 
     companion object {
-        private const val ANTHROPIC_API_URL = "https://api.anthropic.com/v1/messages"
+        private const val GEMINI_API_BASE_URL = "https://generativelanguage.googleapis.com/v1beta/models"
     }
 }

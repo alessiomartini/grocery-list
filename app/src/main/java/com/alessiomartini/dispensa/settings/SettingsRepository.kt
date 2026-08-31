@@ -13,14 +13,14 @@ data class AppSettings(
     val model: String = DEFAULT_MODEL
 ) {
     companion object {
-        const val DEFAULT_MODEL = "claude-sonnet-5"
+        const val DEFAULT_MODEL = "gemini-2.0-flash"
     }
 }
 
 /**
- * Stores the user's own Anthropic API key locally, encrypted with a key held in the
- * Android Keystore. The key never leaves the device except in direct calls to the
- * Anthropic API made from [com.alessiomartini.dispensa.network.RecipeSuggestionRepository].
+ * Stores the user's own Gemini API key locally, encrypted with a key held in the Android
+ * Keystore. The key never leaves the device except in direct calls to the Gemini API made from
+ * [com.alessiomartini.dispensa.network.RecipeSuggestionRepository].
  */
 class SettingsRepository(context: Context) {
 
@@ -57,7 +57,7 @@ class SettingsRepository(context: Context) {
     }
 
     companion object {
-        private const val KEY_API_KEY = "anthropic_api_key"
-        private const val KEY_MODEL = "anthropic_model"
+        private const val KEY_API_KEY = "gemini_api_key"
+        private const val KEY_MODEL = "gemini_model"
     }
 }

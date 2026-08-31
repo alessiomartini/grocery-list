@@ -34,15 +34,15 @@
     <string name="recipes_title">Recipes from what you have</string>
     <string name="recipes_suggest_button">Suggest recipes</string>
     <string name="recipes_empty_pantry">Your pantry is empty: add some items before asking for recipes.</string>
-    <string name="recipes_missing_key">Add your Claude API key in Settings to use this feature.</string>
+    <string name="recipes_missing_key">Add your Gemini API key in Settings to use this feature.</string>
     <string name="recipes_loading">Thinking of some recipes…</string>
     <string name="recipes_error">Couldn\'t generate recipes: %1$s</string>
     <string name="recipes_uses">Uses: %1$s</string>
     <string name="recipes_missing_ingredients">You\'ll also need: %1$s</string>
 
-    <string name="settings_api_key_title">Claude API key (Anthropic)</string>
-    <string name="settings_api_key_hint">sk-ant-…</string>
-    <string name="settings_api_key_description">The key is stored only on this device, encrypted, and used only to ask for recipe ideas. You can create one at console.anthropic.com.</string>
+    <string name="settings_api_key_title">Gemini API key (Google AI)</string>
+    <string name="settings_api_key_hint">AIza…</string>
+    <string name="settings_api_key_description">The key is stored only on this device, encrypted, and used only to ask for recipe ideas. Create a free one at aistudio.google.com/apikey.</string>
     <string name="settings_model_title">Model</string>
     <string name="settings_saved">Settings saved</string>
 
