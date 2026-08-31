@@ -1,12 +1,19 @@
 package com.alessiomartini.dispensa.ui.list
 
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.AssistChip
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -26,6 +33,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.alessiomartini.dispensa.R
+import com.alessiomartini.dispensa.data.FoodCatalog
+import com.alessiomartini.dispensa.data.FoodCatalogItem
 import com.alessiomartini.dispensa.data.GroceryItem
 import com.alessiomartini.dispensa.data.ItemStatus
 
@@ -39,6 +48,7 @@ fun ListScreen(viewModel: ListViewModel, onSettingsClick: () -> Unit) {
 
     val toBuyItems = items.filter { it.status == ItemStatus.TO_BUY }
     val pantryItems = items.filter { it.status == ItemStatus.IN_PANTRY }
+    val suggestedItems = FoodCatalog.quickAddCandidates(items.map { it.name })
 
     Scaffold(
         topBar = {
@@ -57,17 +67,29 @@ fun ListScreen(viewModel: ListViewModel, onSettingsClick: () -> Unit) {
             }
         }
     ) { padding ->
-        if (items.isEmpty()) {
-            Text(
-                text = stringResource(R.string.empty_list),
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(padding)
-                    .padding(32.dp),
-                textAlign = TextAlign.Center
-            )
-        } else {
-            LazyColumn(modifier = Modifier.fillMaxSize().padding(padding).padding(horizontal = 16.dp)) {
+        LazyColumn(modifier = Modifier.fillMaxSize().padding(padding).padding(horizontal = 16.dp)) {
+            if (suggestedItems.isNotEmpty()) {
+                item {
+                    SuggestedSection(suggestedItems) { suggestion ->
+                        viewModel.addItem(
+                            name = suggestion.name,
+                            quantity = 1,
+                            unit = "",
+                            category = suggestion.category
+                        )
+                    }
+                }
+            }
+
+            if (items.isEmpty()) {
+                item {
+                    Text(
+                        text = stringResource(R.string.empty_list),
+                        modifier = Modifier.fillMaxWidth().padding(vertical = 32.dp),
+                        textAlign = TextAlign.Center
+                    )
+                }
+            } else {
                 if (toBuyItems.isNotEmpty()) {
                     item { SectionHeader(stringResource(R.string.section_to_buy)) }
                     items(toBuyItems, key = { it.id }) { groceryItem ->
@@ -115,6 +137,31 @@ fun ListScreen(viewModel: ListViewModel, onSettingsClick: () -> Unit) {
         ExpiryDatePickerDialog(initialDate = editingItem.expiryDate) { date ->
             viewModel.updateExpiryDate(editingItem, date)
             itemEditingExpiry = null
+        }
+    }
+}
+
+@Composable
+private fun SuggestedSection(suggestions: List<FoodCatalogItem>, onAdd: (FoodCatalogItem) -> Unit) {
+    Column {
+        Text(
+            text = stringResource(R.string.suggested_section_title),
+            style = MaterialTheme.typography.titleSmall,
+            modifier = Modifier.padding(top = 16.dp, bottom = 4.dp)
+        )
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .horizontalScroll(rememberScrollState())
+                .padding(bottom = 8.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            suggestions.forEach { suggestion ->
+                AssistChip(
+                    onClick = { onAdd(suggestion) },
+                    label = { Text("${suggestion.icon} ${suggestion.name}") }
+                )
+            }
         }
     }
 }

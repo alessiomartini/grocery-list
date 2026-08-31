@@ -1,9 +1,12 @@
 package com.alessiomartini.dispensa.ui.list
 
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.DropdownMenuItem
@@ -11,6 +14,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.SuggestionChip
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -24,6 +28,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.alessiomartini.dispensa.R
 import com.alessiomartini.dispensa.data.Categories
+import com.alessiomartini.dispensa.data.FoodCatalog
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -36,6 +41,10 @@ fun AddItemDialog(
     var unit by remember { mutableStateOf("") }
     var category by remember { mutableStateOf(Categories.DEFAULT) }
     var categoryExpanded by remember { mutableStateOf(false) }
+    var categoryManuallySet by remember { mutableStateOf(false) }
+
+    val nameSuggestions = remember(name) { FoodCatalog.suggestions(name) }
+        .filter { !it.name.equals(name.trim(), ignoreCase = true) }
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -44,10 +53,35 @@ fun AddItemDialog(
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 OutlinedTextField(
                     value = name,
-                    onValueChange = { name = it },
+                    onValueChange = { newValue ->
+                        name = newValue
+                        if (!categoryManuallySet) {
+                            FoodCatalog.categoryFor(newValue)?.let { category = it }
+                        }
+                    },
                     label = { Text(stringResource(R.string.item_name)) },
                     singleLine = true
                 )
+
+                if (nameSuggestions.isNotEmpty()) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .horizontalScroll(rememberScrollState()),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        nameSuggestions.forEach { suggestion ->
+                            SuggestionChip(
+                                onClick = {
+                                    name = suggestion.name
+                                    category = suggestion.category
+                                    categoryManuallySet = true
+                                },
+                                label = { Text("${suggestion.icon} ${suggestion.name}") }
+                            )
+                        }
+                    }
+                }
 
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     OutlinedTextField(
@@ -88,6 +122,7 @@ fun AddItemDialog(
                                 text = { Text(option) },
                                 onClick = {
                                     category = option
+                                    categoryManuallySet = true
                                     categoryExpanded = false
                                 }
                             )

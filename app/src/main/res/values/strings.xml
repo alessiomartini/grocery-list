@@ -10,6 +10,7 @@
     <string name="section_to_buy">To buy</string>
     <string name="section_in_pantry">In pantry</string>
     <string name="empty_list">No items yet. Tap + to add one.</string>
+    <string name="suggested_section_title">Suggested</string>
 
     <string name="add_item">Add item</string>
     <string name="item_name">Name</string>

@@ -18,7 +18,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.alessiomartini.dispensa.R
+import com.alessiomartini.dispensa.data.FoodCatalog
 import com.alessiomartini.dispensa.data.GroceryItem
 import com.alessiomartini.dispensa.data.ItemStatus
 import com.alessiomartini.dispensa.ui.expiry.colorForUrgency
@@ -41,6 +43,12 @@ fun ItemRow(
             .padding(vertical = 4.dp)
     ) {
         Checkbox(checked = item.status == ItemStatus.IN_PANTRY, onCheckedChange = { onToggle() })
+
+        Text(
+            text = FoodCatalog.iconFor(item.name, item.category),
+            fontSize = 22.sp,
+            modifier = Modifier.padding(end = 8.dp)
+        )
 
         Column(
             modifier = Modifier
