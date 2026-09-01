@@ -32,8 +32,15 @@ class ListViewModel(private val repository: ItemRepository) : ViewModel() {
         viewModelScope.launch { repository.markAsFinished(item) }
     }
 
-    fun updateExpiryDate(item: GroceryItem, expiryDate: LocalDate?) {
-        viewModelScope.launch { repository.updateExpiryDate(item, expiryDate) }
+    fun updateItem(
+        item: GroceryItem,
+        name: String,
+        quantity: Int,
+        unit: String,
+        category: String,
+        expiryDate: LocalDate?
+    ) {
+        viewModelScope.launch { repository.updateItem(item, name, quantity, unit, category, expiryDate) }
     }
 
     fun deleteItem(item: GroceryItem) {

@@ -1,14 +1,16 @@
 package com.alessiomartini.dispensa.ui.list
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -33,10 +35,19 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.alessiomartini.dispensa.R
+import com.alessiomartini.dispensa.data.Categories
 import com.alessiomartini.dispensa.data.FoodCatalog
 import com.alessiomartini.dispensa.data.FoodCatalogItem
 import com.alessiomartini.dispensa.data.GroceryItem
 import com.alessiomartini.dispensa.data.ItemStatus
+
+private val categoryOrderIndex: Map<String, Int> =
+    Categories.SUGGESTED.withIndex().associate { (index, category) -> category to index }
+
+private fun groupByCategory(items: List<GroceryItem>): List<Pair<String, List<GroceryItem>>> =
+    items.groupBy { it.category }
+        .toList()
+        .sortedBy { (category, _) -> categoryOrderIndex[category] ?: Int.MAX_VALUE }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -44,7 +55,7 @@ fun ListScreen(viewModel: ListViewModel, onSettingsClick: () -> Unit) {
     val items by viewModel.items.collectAsState()
     var showAddDialog by remember { mutableStateOf(false) }
     var itemPendingExpiry by remember { mutableStateOf<GroceryItem?>(null) }
-    var itemEditingExpiry by remember { mutableStateOf<GroceryItem?>(null) }
+    var itemEditing by remember { mutableStateOf<GroceryItem?>(null) }
 
     val toBuyItems = items.filter { it.status == ItemStatus.TO_BUY }
     val pantryItems = items.filter { it.status == ItemStatus.IN_PANTRY }
@@ -92,24 +103,28 @@ fun ListScreen(viewModel: ListViewModel, onSettingsClick: () -> Unit) {
             } else {
                 if (toBuyItems.isNotEmpty()) {
                     item { SectionHeader(stringResource(R.string.section_to_buy)) }
-                    items(toBuyItems, key = { it.id }) { groceryItem ->
-                        ItemRow(
-                            item = groceryItem,
-                            onToggle = { itemPendingExpiry = groceryItem },
-                            onDelete = { viewModel.deleteItem(groceryItem) },
-                            onEditExpiry = {}
-                        )
+                    groupByCategory(toBuyItems).forEach { (category, categoryItems) ->
+                        item {
+                            CategoryGroup(
+                                category = category,
+                                items = categoryItems,
+                                onTap = { itemPendingExpiry = it },
+                                onLongPress = { itemEditing = it }
+                            )
+                        }
                     }
                 }
                 if (pantryItems.isNotEmpty()) {
                     item { SectionHeader(stringResource(R.string.section_in_pantry)) }
-                    items(pantryItems, key = { it.id }) { groceryItem ->
-                        ItemRow(
-                            item = groceryItem,
-                            onToggle = { viewModel.markAsFinished(groceryItem) },
-                            onDelete = { viewModel.deleteItem(groceryItem) },
-                            onEditExpiry = { itemEditingExpiry = groceryItem }
-                        )
+                    groupByCategory(pantryItems).forEach { (category, categoryItems) ->
+                        item {
+                            CategoryGroup(
+                                category = category,
+                                items = categoryItems,
+                                onTap = { viewModel.markAsFinished(it) },
+                                onLongPress = { itemEditing = it }
+                            )
+                        }
                     }
                 }
             }
@@ -134,10 +149,45 @@ fun ListScreen(viewModel: ListViewModel, onSettingsClick: () -> Unit) {
         }
     }
 
-    itemEditingExpiry?.let { editingItem ->
-        ExpiryDatePickerDialog(initialDate = editingItem.expiryDate) { date ->
-            viewModel.updateExpiryDate(editingItem, date)
-            itemEditingExpiry = null
+    itemEditing?.let { editingItem ->
+        EditItemDialog(
+            item = editingItem,
+            onDismiss = { itemEditing = null },
+            onConfirm = { name, quantity, unit, category, expiryDate ->
+                viewModel.updateItem(editingItem, name, quantity, unit, category, expiryDate)
+                itemEditing = null
+            },
+            onDelete = { viewModel.deleteItem(editingItem) }
+        )
+    }
+}
+
+@OptIn(ExperimentalFoundationApi::class, ExperimentalLayoutApi::class)
+@Composable
+private fun CategoryGroup(
+    category: String,
+    items: List<GroceryItem>,
+    onTap: (GroceryItem) -> Unit,
+    onLongPress: (GroceryItem) -> Unit
+) {
+    Column {
+        Text(
+            text = category,
+            style = MaterialTheme.typography.labelLarge,
+            color = MaterialTheme.colorScheme.primary,
+            modifier = Modifier.padding(top = 8.dp, bottom = 4.dp)
+        )
+        FlowRow(
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            items.forEach { groceryItem ->
+                ItemTile(
+                    item = groceryItem,
+                    onTap = { onTap(groceryItem) },
+                    onLongPress = { onLongPress(groceryItem) }
+                )
+            }
         }
     }
 }

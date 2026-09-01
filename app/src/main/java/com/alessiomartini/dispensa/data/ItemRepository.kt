@@ -51,23 +51,23 @@ class ItemRepository(private val dao: ItemDao) {
         )
     }
 
-    suspend fun updateExpiryDate(item: GroceryItem, expiryDate: LocalDate?) {
-        dao.update(item.copy(expiryDate = expiryDate, expiryNotified = false))
-    }
-
-    suspend fun updateDetails(
+    /** Full edit (name/quantity/unit/category/expiry) in one write, so partial updates can't clobber each other. */
+    suspend fun updateItem(
         item: GroceryItem,
         name: String,
         quantity: Int,
         unit: String,
-        category: String
+        category: String,
+        expiryDate: LocalDate?
     ) {
         dao.update(
             item.copy(
                 name = name.trim(),
                 quantity = quantity,
                 unit = unit.trim(),
-                category = category
+                category = category,
+                expiryDate = expiryDate,
+                expiryNotified = false
             )
         )
     }
