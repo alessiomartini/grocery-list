@@ -6,6 +6,7 @@ import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import com.alessiomartini.dispensa.data.AppDatabase
 import com.alessiomartini.dispensa.data.ItemRepository
+import com.alessiomartini.dispensa.network.ReceiptScanRepository
 import com.alessiomartini.dispensa.network.RecipeSuggestionRepository
 import com.alessiomartini.dispensa.network.UpdateRepository
 import com.alessiomartini.dispensa.notifications.ExpiryCheckWorker
@@ -20,6 +21,9 @@ class DispensaApplication : Application() {
     val settingsRepository: SettingsRepository by lazy { SettingsRepository(this) }
     val recipeSuggestionRepository: RecipeSuggestionRepository by lazy {
         RecipeSuggestionRepository(settingsRepository)
+    }
+    val receiptScanRepository: ReceiptScanRepository by lazy {
+        ReceiptScanRepository(settingsRepository)
     }
     val updateRepository: UpdateRepository by lazy { UpdateRepository(this) }
 

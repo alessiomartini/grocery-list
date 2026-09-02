@@ -16,7 +16,14 @@ data class GeminiContent(
 
 @Serializable
 data class GeminiPart(
-    val text: String
+    val text: String? = null,
+    val inlineData: GeminiInlineData? = null
+)
+
+@Serializable
+data class GeminiInlineData(
+    val mimeType: String,
+    val data: String
 )
 
 @Serializable
