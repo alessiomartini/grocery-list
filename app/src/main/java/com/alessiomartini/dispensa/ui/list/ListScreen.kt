@@ -1,6 +1,7 @@
 package com.alessiomartini.dispensa.ui.list
 
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -12,16 +13,17 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material3.AssistChip
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -53,13 +55,14 @@ private fun groupByCategory(items: List<GroceryItem>): List<Pair<String, List<Gr
 @Composable
 fun ListScreen(viewModel: ListViewModel, onSettingsClick: () -> Unit) {
     val items by viewModel.items.collectAsState()
+    val dismissedSuggestions by viewModel.dismissedSuggestions.collectAsState()
     var showAddDialog by remember { mutableStateOf(false) }
     var itemPendingExpiry by remember { mutableStateOf<GroceryItem?>(null) }
     var itemEditing by remember { mutableStateOf<GroceryItem?>(null) }
 
     val toBuyItems = items.filter { it.status == ItemStatus.TO_BUY }
     val pantryItems = items.filter { it.status == ItemStatus.IN_PANTRY }
-    val suggestedItems = FoodCatalog.quickAddCandidates(items.map { it.name })
+    val suggestedItems = FoodCatalog.quickAddCandidates(items.map { it.name } + dismissedSuggestions)
 
     Scaffold(
         topBar = {
@@ -81,14 +84,18 @@ fun ListScreen(viewModel: ListViewModel, onSettingsClick: () -> Unit) {
         LazyColumn(modifier = Modifier.fillMaxSize().padding(padding).padding(horizontal = 16.dp)) {
             if (suggestedItems.isNotEmpty()) {
                 item {
-                    SuggestedSection(suggestedItems) { suggestion ->
-                        viewModel.addItem(
-                            name = suggestion.name,
-                            quantity = 1,
-                            unit = "",
-                            category = suggestion.category
-                        )
-                    }
+                    SuggestedSection(
+                        suggestions = suggestedItems,
+                        onAdd = { suggestion ->
+                            viewModel.addItem(
+                                name = suggestion.name,
+                                quantity = 1,
+                                unit = "",
+                                category = suggestion.category
+                            )
+                        },
+                        onDismiss = { suggestion -> viewModel.dismissSuggestion(suggestion.name) }
+                    )
                 }
             }
 
@@ -192,8 +199,13 @@ private fun CategoryGroup(
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
-private fun SuggestedSection(suggestions: List<FoodCatalogItem>, onAdd: (FoodCatalogItem) -> Unit) {
+private fun SuggestedSection(
+    suggestions: List<FoodCatalogItem>,
+    onAdd: (FoodCatalogItem) -> Unit,
+    onDismiss: (FoodCatalogItem) -> Unit
+) {
     Column {
         Text(
             text = stringResource(R.string.suggested_section_title),
@@ -208,10 +220,20 @@ private fun SuggestedSection(suggestions: List<FoodCatalogItem>, onAdd: (FoodCat
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             suggestions.forEach { suggestion ->
-                AssistChip(
-                    onClick = { onAdd(suggestion) },
-                    label = { Text("${suggestion.icon} ${suggestion.name}") }
-                )
+                Surface(
+                    shape = RoundedCornerShape(8.dp),
+                    color = MaterialTheme.colorScheme.surfaceVariant,
+                    modifier = Modifier.combinedClickable(
+                        onClick = { onAdd(suggestion) },
+                        onLongClick = { onDismiss(suggestion) }
+                    )
+                ) {
+                    Text(
+                        text = "${suggestion.icon} ${suggestion.name}",
+                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
+                        style = MaterialTheme.typography.labelLarge
+                    )
+                }
             }
         }
     }

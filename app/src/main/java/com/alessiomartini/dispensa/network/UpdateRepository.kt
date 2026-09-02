@@ -25,6 +25,10 @@ sealed interface UpdateCheckResult {
 /**
  * Checks GitHub Releases for a newer build of the app (there's no Play Store listing) and can
  * download + launch the installer for the APK asset attached to that release.
+ *
+ * CI always publishes to a single release tagged "latest" (overwritten on every push, no manual
+ * tagging), so "newer" is decided by comparing [BuildConfig.VERSION_CODE] against a version.txt
+ * asset in that release rather than by parsing the tag name.
  */
 class UpdateRepository(private val context: Context) {
 
@@ -55,13 +59,17 @@ class UpdateRepository(private val context: Context) {
                     GitHubRelease.serializer(),
                     response.body?.string().orEmpty()
                 )
-                val remoteVersion = release.tag_name.removePrefix("v")
                 val apkAsset = release.assets.firstOrNull { it.name.endsWith(".apk") }
                     ?: return@withContext UpdateCheckResult.Error("The latest release doesn't have an .apk file attached")
+                val versionAsset = release.assets.firstOrNull { it.name == "version.txt" }
+                    ?: return@withContext UpdateCheckResult.Error("The latest release is missing its version info")
 
-                if (isNewerVersion(remoteVersion, BuildConfig.VERSION_NAME)) {
+                val remoteVersionCode = downloadVersionCode(versionAsset.browser_download_url)
+                    ?: return@withContext UpdateCheckResult.Error("Couldn't read the remote version")
+
+                if (remoteVersionCode > BuildConfig.VERSION_CODE) {
                     UpdateCheckResult.Available(
-                        version = remoteVersion,
+                        version = "1.$remoteVersionCode",
                         notes = release.body.orEmpty(),
                         downloadUrl = apkAsset.browser_download_url
                     )
@@ -73,6 +81,14 @@ class UpdateRepository(private val context: Context) {
             UpdateCheckResult.Error(e.message ?: "Network error")
         } catch (e: Exception) {
             UpdateCheckResult.Error(e.message ?: "Unexpected error")
+        }
+    }
+
+    private fun downloadVersionCode(url: String): Int? {
+        val request = Request.Builder().url(url).build()
+        client.newCall(request).execute().use { response ->
+            if (!response.isSuccessful) return null
+            return response.body?.string()?.trim()?.toIntOrNull()
         }
     }
 
@@ -114,16 +130,5 @@ class UpdateRepository(private val context: Context) {
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         }
         context.startActivity(intent)
-    }
-
-    private fun isNewerVersion(remote: String, local: String): Boolean {
-        val remoteParts = remote.split(".", "-").mapNotNull { it.toIntOrNull() }
-        val localParts = local.split(".", "-").mapNotNull { it.toIntOrNull() }
-        for (i in 0 until maxOf(remoteParts.size, localParts.size)) {
-            val r = remoteParts.getOrElse(i) { 0 }
-            val l = localParts.getOrElse(i) { 0 }
-            if (r != l) return r > l
-        }
-        return false
     }
 }

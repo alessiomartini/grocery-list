@@ -174,7 +174,7 @@ object FoodCatalog {
     }
 
     /** Common items not already in [existingNames], to suggest adding to the shopping list. */
-    fun quickAddCandidates(existingNames: Collection<String>, limit: Int = 12): List<FoodCatalogItem> {
+    fun quickAddCandidates(existingNames: Collection<String>, limit: Int = 24): List<FoodCatalogItem> {
         val existing = existingNames.map { it.trim().lowercase() }.toSet()
         return items
             .filter { item -> item.name.lowercase() !in existing }

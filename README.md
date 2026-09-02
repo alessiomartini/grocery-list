@@ -9,7 +9,7 @@ Pensata per sostituire il workflow "lista con spunte" di Google Keep: quando com
 - **Lista a griglia stile Keep**: sezione "Da comprare" e "In dispensa", articoli raggruppati per categoria. Tocco breve su un articolo → cambia stato (comprato/finito, con scadenza opzionale). Tocco lungo → modifica nome, quantità, unità, categoria, scadenza o elimina l'articolo.
 - **Scadenze**: schermata dedicata con tutti i prodotti in dispensa che hanno una data di scadenza, ordinati ed evidenziati (scaduto / oggi / entro 3 giorni). Notifica push giornaliera se qualcosa sta per scadere. Quando spunti un articolo come comprato, la data viene **precompilata automaticamente** in base al tipo di alimento (es. latte ~7 giorni, pasta ~1 anno, pollo fresco ~2 giorni) — resta comunque modificabile o rimovibile.
 - **Ricette**: genera 3 idee di ricette in base a quello che hai in dispensa, usando l'API di Gemini (Google), che ha un piano gratuito. Richiede una tua API key personale, inserita nelle Impostazioni.
-- **Aggiornamenti**: bottone in Impostazioni per controllare se è disponibile una versione più recente dell'app (pubblicata come Release su GitHub) e installarla, dato che l'app non è distribuita tramite Play Store.
+- **Aggiornamenti automatici**: bottone in Impostazioni per controllare se è disponibile una versione più recente dell'app e installarla, dato che l'app non è distribuita tramite Play Store. Ogni push su questo repository pubblica automaticamente una nuova build — non serve creare tag o versioni a mano.
 - Tutti i dati (lista, dispensa, scadenze) restano **sul dispositivo**, salvati con Room/SQLite. Nessun account, nessun cloud.
 
 ## Come compilare
@@ -30,7 +30,7 @@ L'APK generato si trova in `app/build/outputs/apk/debug/`.
 
 Il workflow `.github/workflows/build-apk.yml` compila l'app e ne esegue i test su ogni push, su GitHub Actions — non nell'ambiente di sviluppo remoto usato per scrivere il codice, che non ha accesso all'Android SDK. È così che il codice viene verificato: [![Build APK](https://github.com/alessiomartini/grocery-list/actions/workflows/build-apk.yml/badge.svg)](https://github.com/alessiomartini/grocery-list/actions/workflows/build-apk.yml)
 
-Quando fai push di un **tag `v*`** (es. `v1.1`), il workflow compila anche l'APK e lo pubblica automaticamente come GitHub Release con quel tag — è lo stesso meccanismo che alimenta il bottone "Controlla aggiornamenti" dell'app (vedi sotto).
+**Ogni push su un branch** (non le pull request) pubblica anche automaticamente l'APK come [Release GitHub taggata `latest`](https://github.com/alessiomartini/grocery-list/releases/tag/latest), sovrascrivendo quella precedente — nessun tag manuale da creare. `versionCode`/`versionName` vengono impostati dalla CI in base al numero di run del workflow (`APP_VERSION_CODE`/`APP_VERSION_NAME`, letti da `app/build.gradle.kts` via variabili d'ambiente), quindi ogni build pubblicata ha una versione unica e crescente.
 
 ## Configurare le ricette (API key Gemini, gratuita)
 
@@ -46,12 +46,10 @@ Se non inserisci una chiave, tutto il resto dell'app (lista, dispensa, scadenze,
 
 ## Pubblicare un aggiornamento
 
-Il bottone "Controlla aggiornamenti" nelle Impostazioni legge le [Release GitHub](https://github.com/alessiomartini/grocery-list/releases) di questo repository. Per pubblicare una nuova versione:
+Non serve fare niente di manuale: **basta pushare un commit** su questo repository.
 
-1. Alza `versionName` (e `versionCode`) in `app/build.gradle.kts`.
-2. Fai push di un tag **uguale al nuovo `versionName`, con prefisso `v`** (es. `v1.1`): `git tag v1.1 && git push origin v1.1`.
-3. Il workflow `build-apk.yml` compila l'APK e crea automaticamente la Release GitHub con quel tag, allegando l'apk.
-4. Chi ha già installato l'app vedrà l'aggiornamento disponibile aprendo Impostazioni → "Controlla aggiornamenti".
+1. Il workflow compila l'APK, calcola una versione dal numero di run (`versionCode` cresce sempre), e pubblica/aggiorna la Release GitHub taggata `latest` con l'APK e un file `version.txt`.
+2. L'app confronta il proprio `versionCode` con quello in `version.txt`: se il remoto è più recente, Impostazioni → "Controlla aggiornamenti" propone il download.
 
 Al primo utilizzo, Android chiederà il permesso di installare app da questa sorgente (necessario perché l'app non viene dal Play Store): l'app apre automaticamente le impostazioni di sistema corrette se il permesso non è ancora stato concesso.
 

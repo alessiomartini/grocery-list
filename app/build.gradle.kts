@@ -14,8 +14,10 @@ android {
         applicationId = "com.alessiomartini.dispensa"
         minSdk = 26
         targetSdk = 34
-        versionCode = 6
-        versionName = "1.5"
+        // CI overrides these (APP_VERSION_CODE/APP_VERSION_NAME) so every pushed build gets a
+        // unique, monotonically increasing version with no manual bump or tag needed.
+        versionCode = System.getenv("APP_VERSION_CODE")?.toIntOrNull() ?: 1
+        versionName = System.getenv("APP_VERSION_NAME") ?: "dev"
 
         buildConfigField("String", "GITHUB_REPO", "\"alessiomartini/grocery-list\"")
 
