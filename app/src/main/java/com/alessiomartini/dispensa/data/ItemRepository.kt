@@ -27,21 +27,6 @@ class ItemRepository(private val dao: ItemDao) {
         )
     }
 
-    /** New item that goes straight into the pantry (e.g. from a scanned receipt), category/expiry auto-guessed. */
-    suspend fun addToPantry(name: String, quantity: Int) {
-        val category = FoodCatalog.categoryFor(name) ?: Categories.DEFAULT
-        dao.upsert(
-            GroceryItem(
-                name = name.trim(),
-                quantity = quantity.coerceAtLeast(1),
-                unit = "",
-                category = category,
-                status = ItemStatus.IN_PANTRY,
-                expiryDate = FoodCatalog.suggestedExpiryDate(name, category)
-            )
-        )
-    }
-
     /** Item bought: moves from "to buy" to "in pantry", optionally with an expiry date. */
     suspend fun markAsBought(item: GroceryItem, expiryDate: LocalDate?) {
         dao.update(

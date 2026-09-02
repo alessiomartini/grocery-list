@@ -13,10 +13,6 @@
     <string name="suggested_section_title">Suggested</string>
 
     <string name="add_item">Add item</string>
-    <string name="scan_receipt">Scan receipt</string>
-    <string name="receipt_scan_done">Added %1$d items to your pantry</string>
-    <string name="receipt_scan_no_key">Add your Gemini API key in Settings to scan receipts.</string>
-    <string name="receipt_scan_error">Couldn\'t scan receipt: %1$s</string>
     <string name="edit_item">Edit item</string>
     <string name="item_name">Name</string>
     <string name="item_quantity">Quantity</string>

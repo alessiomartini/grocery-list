@@ -85,9 +85,7 @@ fun DispensaApp(app: DispensaApplication) {
         ) {
             composable(Routes.LIST) {
                 val viewModel: ListViewModel = viewModel(
-                    factory = LambdaViewModelFactory {
-                        ListViewModel(app.itemRepository, app.receiptScanRepository)
-                    }
+                    factory = LambdaViewModelFactory { ListViewModel(app.itemRepository) }
                 )
                 ListScreen(viewModel, onSettingsClick = { navController.navigate(Routes.SETTINGS) })
             }
