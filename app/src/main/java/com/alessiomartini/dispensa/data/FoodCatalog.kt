@@ -43,6 +43,9 @@ object FoodCatalog {
         FoodCatalogItem("Bell pepper", "Fruits and vegetables", "🫑", 10, listOf("peppers")),
         FoodCatalogItem("Mushroom", "Fruits and vegetables", "🍄", 5, listOf("mushrooms")),
         FoodCatalogItem("Corn", "Fruits and vegetables", "🌽", 3),
+        // Named explicitly (not left to the "egg" keyword match) so it doesn't pick up Eggs' icon.
+        FoodCatalogItem("Eggplant", "Fruits and vegetables", "🍆", 7, listOf("aubergine")),
+        FoodCatalogItem("Zucchini", "Fruits and vegetables", "🥒", 7, listOf("courgette")),
 
         // Dairy and eggs
         FoodCatalogItem("Milk", "Dairy and eggs", "🥛", 7),
@@ -62,6 +65,8 @@ object FoodCatalog {
         FoodCatalogItem("Shrimp", "Meat and fish", "🍤", 2, listOf("prawns")),
         FoodCatalogItem("Sausage", "Meat and fish", "🌭", 7, listOf("sausages")),
         FoodCatalogItem("Ham", "Meat and fish", "🍖", 5),
+        FoodCatalogItem("Tofu", "Meat and fish", "⬜", 7),
+        FoodCatalogItem("Schnitzel", "Meat and fish", "🥩", 3),
 
         // Bread and cereals
         FoodCatalogItem("Bread", "Bread and cereals", "🍞", 5),
@@ -72,6 +77,7 @@ object FoodCatalog {
         FoodCatalogItem("Flour", "Bread and cereals", "🌾", 180),
         FoodCatalogItem("Bagel", "Bread and cereals", "🥯", 5, listOf("bagels")),
         FoodCatalogItem("Croissant", "Bread and cereals", "🥐", 3, listOf("croissants")),
+        FoodCatalogItem("Stroopwafel", "Bread and cereals", "🧇", 90, listOf("stroop wafel", "waffle cookie")),
 
         // Pantry staples
         FoodCatalogItem("Salt", "Pantry staples", "🧂", 1825),
@@ -83,6 +89,10 @@ object FoodCatalog {
         FoodCatalogItem("Beans", "Pantry staples", "🥫", 730),
         FoodCatalogItem("Jam", "Pantry staples", "🍓", 365, listOf("marmalade")),
         FoodCatalogItem("Peanut butter", "Pantry staples", "🥜", 180),
+        FoodCatalogItem("Chocolate", "Pantry staples", "🍫", 365),
+        FoodCatalogItem("Pesto", "Pantry staples", "🌿", 180),
+        FoodCatalogItem("Hummus", "Pantry staples", "🫘", 10),
+        FoodCatalogItem("Omega 3", "Pantry staples", "💊", 730, listOf("fish oil", "omega-3")),
 
         // Frozen foods
         FoodCatalogItem("Ice cream", "Frozen foods", "🍦", 90),
@@ -106,7 +116,8 @@ object FoodCatalog {
         FoodCatalogItem("Toothpaste", "Household and hygiene", "🪥"),
         FoodCatalogItem("Shampoo", "Household and hygiene", "🧴"),
         FoodCatalogItem("Trash bags", "Household and hygiene", "🗑️", extraKeywords = listOf("garbage bags")),
-        FoodCatalogItem("Sponge", "Household and hygiene", "🧽", extraKeywords = listOf("sponges"))
+        FoodCatalogItem("Sponge", "Household and hygiene", "🧽", extraKeywords = listOf("sponges")),
+        FoodCatalogItem("Deodorant", "Household and hygiene", "🧴")
     )
 
     private const val DEFAULT_ICON = "🛒"
