@@ -5,6 +5,7 @@
     <string name="nav_list">List</string>
     <string name="nav_expiry">Expiry</string>
     <string name="nav_recipes">Recipes</string>
+    <string name="nav_stats">Stats</string>
     <string name="nav_settings">Settings</string>
 
     <string name="section_to_buy">To buy</string>
@@ -59,4 +60,10 @@
     <string name="update_downloading">Downloading…</string>
     <string name="update_ready_button">Install now</string>
     <string name="update_error">Couldn\'t check for updates: %1$s</string>
+
+    <string name="stats_empty">No purchases recorded yet. Once you check items off as bought, they\'ll show up here.</string>
+    <string name="stats_bought_once">Bought once</string>
+    <string name="stats_bought_times">Bought %1$d times</string>
+    <string name="stats_avg_frequency">Every ~%1$d days</string>
+    <string name="stats_last_purchased">Last: %1$s</string>
 </resources>

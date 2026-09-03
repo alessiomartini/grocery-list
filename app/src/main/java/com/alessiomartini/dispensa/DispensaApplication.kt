@@ -16,7 +16,9 @@ import java.util.concurrent.TimeUnit
 class DispensaApplication : Application() {
 
     val database: AppDatabase by lazy { AppDatabase.getInstance(this) }
-    val itemRepository: ItemRepository by lazy { ItemRepository(database.itemDao()) }
+    val itemRepository: ItemRepository by lazy {
+        ItemRepository(database.itemDao(), database.purchaseHistoryDao())
+    }
     val settingsRepository: SettingsRepository by lazy { SettingsRepository(this) }
     val recipeSuggestionRepository: RecipeSuggestionRepository by lazy {
         RecipeSuggestionRepository(settingsRepository)

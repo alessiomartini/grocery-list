@@ -4,11 +4,13 @@ import kotlinx.coroutines.flow.Flow
 import java.time.Instant
 import java.time.LocalDate
 
-class ItemRepository(private val dao: ItemDao) {
+class ItemRepository(private val dao: ItemDao, private val purchaseHistoryDao: PurchaseHistoryDao) {
 
     fun observeAll(): Flow<List<GroceryItem>> = dao.observeAll()
 
     fun observePantryWithExpiry(): Flow<List<GroceryItem>> = dao.observePantryWithExpiry()
+
+    fun observePurchaseHistory(): Flow<List<PurchaseRecord>> = purchaseHistoryDao.observeAll()
 
     suspend fun addToShoppingList(
         name: String,
@@ -36,6 +38,9 @@ class ItemRepository(private val dao: ItemDao) {
                 statusChangedAt = Instant.now(),
                 expiryNotified = false
             )
+        )
+        purchaseHistoryDao.insert(
+            PurchaseRecord(name = item.name, category = item.category, purchasedAt = LocalDate.now())
         )
     }
 

@@ -2,6 +2,7 @@ package com.alessiomartini.dispensa.ui
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.BarChart
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Checklist
 import androidx.compose.material.icons.filled.Restaurant
@@ -32,11 +33,14 @@ import com.alessiomartini.dispensa.ui.recipes.RecipesViewModel
 import com.alessiomartini.dispensa.ui.settings.SettingsScreen
 import com.alessiomartini.dispensa.ui.settings.SettingsViewModel
 import com.alessiomartini.dispensa.ui.settings.UpdateViewModel
+import com.alessiomartini.dispensa.ui.stats.StatsScreen
+import com.alessiomartini.dispensa.ui.stats.StatsViewModel
 
 private object Routes {
     const val LIST = "list"
     const val EXPIRY = "expiry"
     const val RECIPES = "recipes"
+    const val STATS = "stats"
     const val SETTINGS = "settings"
 }
 
@@ -45,7 +49,8 @@ private data class BottomNavItem(val route: String, val labelRes: Int, val icon:
 private val bottomNavItems = listOf(
     BottomNavItem(Routes.LIST, R.string.nav_list, Icons.Filled.Checklist),
     BottomNavItem(Routes.EXPIRY, R.string.nav_expiry, Icons.Filled.CalendarMonth),
-    BottomNavItem(Routes.RECIPES, R.string.nav_recipes, Icons.Filled.Restaurant)
+    BottomNavItem(Routes.RECIPES, R.string.nav_recipes, Icons.Filled.Restaurant),
+    BottomNavItem(Routes.STATS, R.string.nav_stats, Icons.Filled.BarChart)
 )
 
 @Composable
@@ -102,6 +107,12 @@ fun DispensaApp(app: DispensaApplication) {
                     }
                 )
                 RecipesScreen(viewModel, onSettingsClick = { navController.navigate(Routes.SETTINGS) })
+            }
+            composable(Routes.STATS) {
+                val viewModel: StatsViewModel = viewModel(
+                    factory = LambdaViewModelFactory { StatsViewModel(app.itemRepository) }
+                )
+                StatsScreen(viewModel, onSettingsClick = { navController.navigate(Routes.SETTINGS) })
             }
             composable(Routes.SETTINGS) {
                 val viewModel: SettingsViewModel = viewModel(
