@@ -14,9 +14,14 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -27,6 +32,7 @@ import androidx.navigation.compose.rememberNavController
 import com.alessiomartini.dispensa.DispensaApplication
 import com.alessiomartini.dispensa.R
 import com.alessiomartini.dispensa.data.ItemStatus
+import com.alessiomartini.dispensa.network.AutoUpdateOutcome
 import com.alessiomartini.dispensa.ui.expiry.ExpiryScreen
 import com.alessiomartini.dispensa.ui.expiry.ExpiryViewModel
 import com.alessiomartini.dispensa.ui.list.ListScreen
@@ -87,8 +93,29 @@ fun DispensaApp(app: DispensaApplication) {
 private fun MainPager(app: DispensaApplication, onSettingsClick: () -> Unit) {
     val pagerState = rememberPagerState(pageCount = { Pages.COUNT })
     val scope = rememberCoroutineScope()
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    val needsPermissionMessage = stringResource(R.string.update_auto_needs_permission)
+    val needsPermissionAction = stringResource(R.string.update_auto_needs_permission_action)
+    val failedMessageTemplate = stringResource(R.string.update_auto_failed)
+
+    LaunchedEffect(Unit) {
+        when (val outcome = app.updateRepository.maybeAutoUpdate(app.settingsRepository)) {
+            is AutoUpdateOutcome.NeedsInstallPermission -> {
+                val result = snackbarHostState.showSnackbar(needsPermissionMessage, actionLabel = needsPermissionAction)
+                if (result == SnackbarResult.ActionPerformed) {
+                    app.updateRepository.openInstallPermissionSettings()
+                }
+            }
+            is AutoUpdateOutcome.Failed -> {
+                snackbarHostState.showSnackbar(failedMessageTemplate.format(outcome.message))
+            }
+            AutoUpdateOutcome.NoAction -> Unit
+        }
+    }
 
     Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         bottomBar = {
             NavigationBar {
                 bottomNavItems.forEach { navItem ->

@@ -50,6 +50,8 @@
     <string name="settings_saved">Settings saved</string>
 
     <string name="update_section_title">Updates</string>
+    <string name="settings_auto_update_title">Automatic updates</string>
+    <string name="settings_auto_update_description">There\'s no Play Store listing, so Pantry updates itself from its own GitHub build. When on, it checks in the background and downloads new builds automatically — Android still requires you to tap \"Install\" on the final confirmation, that step can\'t be skipped.</string>
     <string name="update_current_version">Installed version: %1$s</string>
     <string name="update_check_button">Check for updates</string>
     <string name="update_checking">Checking…</string>
@@ -59,4 +61,7 @@
     <string name="update_downloading">Downloading…</string>
     <string name="update_ready_button">Install now</string>
     <string name="update_error">Couldn\'t check for updates: %1$s</string>
+    <string name="update_auto_needs_permission">An update is ready, but Pantry isn\'t allowed to install unknown apps yet.</string>
+    <string name="update_auto_needs_permission_action">Allow</string>
+    <string name="update_auto_failed">Automatic update failed: %1$s</string>
 </resources>

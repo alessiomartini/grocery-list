@@ -20,6 +20,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -30,6 +31,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
@@ -109,15 +111,42 @@ fun SettingsScreen(
 
             HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
 
-            UpdateSection(updateState, updateViewModel)
+            UpdateSection(
+                state = updateState,
+                viewModel = updateViewModel,
+                autoCheckForUpdates = settings.autoCheckForUpdates,
+                onAutoCheckForUpdatesChange = viewModel::setAutoCheckForUpdates
+            )
         }
     }
 }
 
 @Composable
-private fun UpdateSection(state: UpdateUiState, viewModel: UpdateViewModel) {
+private fun UpdateSection(
+    state: UpdateUiState,
+    viewModel: UpdateViewModel,
+    autoCheckForUpdates: Boolean,
+    onAutoCheckForUpdatesChange: (Boolean) -> Unit
+) {
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Text(stringResource(R.string.update_section_title), style = MaterialTheme.typography.titleMedium)
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Column(modifier = Modifier.weight(1f)) {
+                Text(stringResource(R.string.settings_auto_update_title), style = MaterialTheme.typography.bodyLarge)
+                Text(
+                    stringResource(R.string.settings_auto_update_description),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+            Switch(checked = autoCheckForUpdates, onCheckedChange = onAutoCheckForUpdatesChange)
+        }
+
         Text(stringResource(R.string.update_current_version, BuildConfig.VERSION_NAME))
 
         Button(
@@ -160,7 +189,7 @@ private fun UpdateSection(state: UpdateUiState, viewModel: UpdateViewModel) {
 
 @Composable
 private fun LoadingRow(label: String) {
-    Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         CircularProgressIndicator(modifier = Modifier.padding(4.dp))
         Text(label)
     }

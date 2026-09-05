@@ -7,6 +7,7 @@ import android.os.Build
 import android.provider.Settings
 import androidx.core.content.FileProvider
 import com.alessiomartini.dispensa.BuildConfig
+import com.alessiomartini.dispensa.settings.SettingsRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
@@ -20,6 +21,14 @@ sealed interface UpdateCheckResult {
     data class Available(val version: String, val notes: String, val downloadUrl: String) : UpdateCheckResult
     data object UpToDate : UpdateCheckResult
     data class Error(val message: String) : UpdateCheckResult
+}
+
+/** Something worth telling the user about after a silent [UpdateRepository.maybeAutoUpdate] run. */
+sealed interface AutoUpdateOutcome {
+    /** Nothing to show: auto-check is off, throttled, no update found, or it installed cleanly. */
+    data object NoAction : AutoUpdateOutcome
+    data object NeedsInstallPermission : AutoUpdateOutcome
+    data class Failed(val message: String) : AutoUpdateOutcome
 }
 
 /**
@@ -130,5 +139,33 @@ class UpdateRepository(private val context: Context) {
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         }
         context.startActivity(intent)
+    }
+
+    /**
+     * Silently checks for, downloads, and prompts to install a newer build - at most once every
+     * ~20h, and only if the user hasn't turned it off in Settings. Android always requires the
+     * user to confirm the system's install prompt themselves; that final tap can't be automated.
+     */
+    suspend fun maybeAutoUpdate(settingsRepository: SettingsRepository): AutoUpdateOutcome {
+        val settings = settingsRepository.settings.value
+        if (!settings.autoCheckForUpdates) return AutoUpdateOutcome.NoAction
+        val lastCheck = settings.lastUpdateCheckAt ?: 0L
+        if (System.currentTimeMillis() - lastCheck < AUTO_UPDATE_CHECK_INTERVAL_MS) return AutoUpdateOutcome.NoAction
+
+        settingsRepository.setLastUpdateCheckAt(System.currentTimeMillis())
+        val result = checkForUpdate()
+        if (result !is UpdateCheckResult.Available) return AutoUpdateOutcome.NoAction
+
+        return try {
+            if (!canInstallPackages()) return AutoUpdateOutcome.NeedsInstallPermission
+            installApk(downloadApk(result.downloadUrl))
+            AutoUpdateOutcome.NoAction
+        } catch (e: Exception) {
+            AutoUpdateOutcome.Failed(e.message ?: "Update failed")
+        }
+    }
+
+    private companion object {
+        const val AUTO_UPDATE_CHECK_INTERVAL_MS = 20 * 60 * 60 * 1000L
     }
 }

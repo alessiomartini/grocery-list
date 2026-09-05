@@ -6,11 +6,11 @@ Built to replace the "checklist" workflow of Google Keep: when you buy a product
 
 ## Features
 
-- **Keep-style grid list**: separate "To buy" and "In pantry" tabs, items grouped by category. Short tap on an item → changes status (bought/finished, with optional expiry date). Long press → edit name, quantity, unit, category, expiry date, or delete the item.
+- **Keep-style grid list**: separate "To buy" and "In pantry" tabs (swipe left/right between all 4 tabs, or use the bottom nav), items grouped by category. Short tap on an item → changes status (bought/finished, with optional expiry date). Long press → edit name, quantity, unit, category, expiry date, or delete the item.
 - **Expiry**: dedicated screen with all pantry products that have an expiry date, sorted and highlighted (expired / today / within 3 days). Daily push notification if something is about to expire. When you check an item off as bought, the expiry date is estimated **and applied immediately, with no confirmation step**, based on the type of food (e.g. milk ~7 days, pasta ~1 year, fresh chicken ~2 days). To correct the estimate, just long-press → edit expiry.
 - **Recipes**: generates 3 recipe ideas based on what you have in your pantry, using Google's Gemini API, which has a free tier. Requires your own personal API key, entered in Settings.
 - **Purchase history**: every time you check an item off as bought it's recorded in a separate purchase history (kept even if you later edit or delete the item). The stats derived from it (how many times you buy each thing, roughly how often) aren't in the app, but on a companion site — see below.
-- **Automatic updates**: button in Settings to check if a newer version of the app is available and install it, since the app isn't distributed through the Play Store. Every push to this repository automatically publishes a new build — no need to create tags or versions by hand.
+- **Automatic updates**: since the app isn't distributed through the Play Store, it checks its own GitHub build in the background (at most once every ~20h) and downloads + prompts to install newer builds on its own — Android still requires you to tap "Install" on the final confirmation, that step can't be skipped. Can be turned off in Settings, which also has a manual "Check for updates" button. Every push to this repository automatically publishes a new build — no need to create tags or versions by hand.
 - All data (list, pantry, expiry dates, purchase history) stays **on the device**, saved with Room/SQLite. No account, no cloud.
 
 ## How to build
@@ -50,7 +50,7 @@ If you don't enter a key, the rest of the app (list, pantry, expiry dates, notif
 No manual steps needed: **just push a commit** to this repository.
 
 1. The workflow builds the APK, computes a version from the run number (`versionCode` always increases), and publishes/updates the GitHub Release tagged `latest` with the APK and a `version.txt` file.
-2. The app compares its own `versionCode` against the one in `version.txt`: if the remote one is newer, Settings → "Check for updates" offers the download.
+2. The app compares its own `versionCode` against the one in `version.txt`: if the remote one is newer, it downloads it and prompts to install automatically in the background (checked at most once every ~20h), or you can trigger it right away from Settings → "Check for updates".
 
 On first use, Android will ask for permission to install apps from this source (necessary because the app doesn't come from the Play Store): the app automatically opens the correct system settings if the permission hasn't been granted yet.
 
