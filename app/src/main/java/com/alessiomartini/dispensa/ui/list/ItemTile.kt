@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -32,7 +33,16 @@ fun ItemTile(
     onTap: () -> Unit,
     onLongPress: () -> Unit
 ) {
+    // Pantry items get the app's accent tint ("you have this"); to-buy stays neutral ("still needed"),
+    // so the two lists read apart at a glance even scrolled past their section header.
+    val containerColor = if (item.status == ItemStatus.IN_PANTRY) {
+        MaterialTheme.colorScheme.primaryContainer
+    } else {
+        MaterialTheme.colorScheme.surfaceVariant
+    }
+
     Card(
+        colors = CardDefaults.cardColors(containerColor = containerColor),
         modifier = Modifier
             .width(96.dp)
             .combinedClickable(onClick = onTap, onLongClick = onLongPress)

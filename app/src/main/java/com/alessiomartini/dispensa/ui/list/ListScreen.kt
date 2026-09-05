@@ -19,6 +19,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -34,6 +35,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.alessiomartini.dispensa.R
@@ -109,7 +111,7 @@ fun ListScreen(viewModel: ListViewModel, onSettingsClick: () -> Unit) {
                 }
             } else {
                 if (toBuyItems.isNotEmpty()) {
-                    item { SectionHeader(stringResource(R.string.section_to_buy)) }
+                    item { SectionHeader(icon = "🛒", title = stringResource(R.string.section_to_buy)) }
                     groupByCategory(toBuyItems).forEach { (category, categoryItems) ->
                         item {
                             CategoryGroup(
@@ -122,7 +124,16 @@ fun ListScreen(viewModel: ListViewModel, onSettingsClick: () -> Unit) {
                     }
                 }
                 if (pantryItems.isNotEmpty()) {
-                    item { SectionHeader(stringResource(R.string.section_in_pantry)) }
+                    if (toBuyItems.isNotEmpty()) {
+                        item {
+                            HorizontalDivider(
+                                modifier = Modifier.padding(top = 24.dp),
+                                thickness = 2.dp,
+                                color = MaterialTheme.colorScheme.primaryContainer
+                            )
+                        }
+                    }
+                    item { SectionHeader(icon = "🏠", title = stringResource(R.string.section_in_pantry)) }
                     groupByCategory(pantryItems).forEach { (category, categoryItems) ->
                         item {
                             CategoryGroup(
@@ -240,10 +251,11 @@ private fun SuggestedSection(
 }
 
 @Composable
-private fun SectionHeader(title: String) {
+private fun SectionHeader(icon: String, title: String) {
     Text(
-        text = title,
-        style = MaterialTheme.typography.titleSmall,
-        modifier = Modifier.padding(top = 16.dp, bottom = 4.dp)
+        text = "$icon $title",
+        style = MaterialTheme.typography.titleMedium,
+        fontWeight = FontWeight.Bold,
+        modifier = Modifier.padding(top = 16.dp, bottom = 8.dp)
     )
 }
