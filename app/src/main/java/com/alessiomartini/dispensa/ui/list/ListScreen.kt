@@ -59,7 +59,6 @@ fun ListScreen(viewModel: ListViewModel, onSettingsClick: () -> Unit) {
     val items by viewModel.items.collectAsState()
     val dismissedSuggestions by viewModel.dismissedSuggestions.collectAsState()
     var showAddDialog by remember { mutableStateOf(false) }
-    var itemPendingExpiry by remember { mutableStateOf<GroceryItem?>(null) }
     var itemEditing by remember { mutableStateOf<GroceryItem?>(null) }
 
     val toBuyItems = items.filter { it.status == ItemStatus.TO_BUY }
@@ -117,7 +116,11 @@ fun ListScreen(viewModel: ListViewModel, onSettingsClick: () -> Unit) {
                             CategoryGroup(
                                 category = category,
                                 items = categoryItems,
-                                onTap = { itemPendingExpiry = it },
+                                onTap = { boughtItem ->
+                                    val estimatedExpiry =
+                                        FoodCatalog.suggestedExpiryDate(boughtItem.name, boughtItem.category)
+                                    viewModel.markAsBought(boughtItem, estimatedExpiry)
+                                },
                                 onLongPress = { itemEditing = it }
                             )
                         }
@@ -157,14 +160,6 @@ fun ListScreen(viewModel: ListViewModel, onSettingsClick: () -> Unit) {
                 showAddDialog = false
             }
         )
-    }
-
-    itemPendingExpiry?.let { pendingItem ->
-        val suggestedDate = FoodCatalog.suggestedExpiryDate(pendingItem.name, pendingItem.category)
-        ExpiryDatePickerDialog(initialDate = null, preselectedDate = suggestedDate) { date ->
-            viewModel.markAsBought(pendingItem, date)
-            itemPendingExpiry = null
-        }
     }
 
     itemEditing?.let { editingItem ->
