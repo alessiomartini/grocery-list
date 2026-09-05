@@ -19,7 +19,6 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -35,7 +34,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.alessiomartini.dispensa.R
@@ -53,22 +51,32 @@ private fun groupByCategory(items: List<GroceryItem>): List<Pair<String, List<Gr
         .toList()
         .sortedBy { (category, _) -> categoryOrderIndex[category] ?: Int.MAX_VALUE }
 
+/** Shared screen for the "To buy" and "In pantry" tabs - same data, filtered to one [status]. */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ListScreen(viewModel: ListViewModel, onSettingsClick: () -> Unit) {
+fun ListScreen(viewModel: ListViewModel, status: ItemStatus, onSettingsClick: () -> Unit) {
     val items by viewModel.items.collectAsState()
     val dismissedSuggestions by viewModel.dismissedSuggestions.collectAsState()
     var showAddDialog by remember { mutableStateOf(false) }
     var itemEditing by remember { mutableStateOf<GroceryItem?>(null) }
 
-    val toBuyItems = items.filter { it.status == ItemStatus.TO_BUY }
-    val pantryItems = items.filter { it.status == ItemStatus.IN_PANTRY }
-    val suggestedItems = FoodCatalog.quickAddCandidates(items.map { it.name } + dismissedSuggestions)
+    val visibleItems = items.filter { it.status == status }
+    val suggestedItems = if (status == ItemStatus.TO_BUY) {
+        FoodCatalog.quickAddCandidates(items.map { it.name } + dismissedSuggestions)
+    } else {
+        emptyList()
+    }
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(stringResource(R.string.app_name)) },
+                title = {
+                    Text(
+                        stringResource(
+                            if (status == ItemStatus.TO_BUY) R.string.section_to_buy else R.string.section_in_pantry
+                        )
+                    )
+                },
                 actions = {
                     IconButton(onClick = onSettingsClick) {
                         Icon(Icons.Filled.Settings, contentDescription = stringResource(R.string.nav_settings))
@@ -77,8 +85,10 @@ fun ListScreen(viewModel: ListViewModel, onSettingsClick: () -> Unit) {
             )
         },
         floatingActionButton = {
-            FloatingActionButton(onClick = { showAddDialog = true }) {
-                Icon(Icons.Filled.Add, contentDescription = stringResource(R.string.add_item))
+            if (status == ItemStatus.TO_BUY) {
+                FloatingActionButton(onClick = { showAddDialog = true }) {
+                    Icon(Icons.Filled.Add, contentDescription = stringResource(R.string.add_item))
+                }
             }
         }
     ) { padding ->
@@ -100,52 +110,33 @@ fun ListScreen(viewModel: ListViewModel, onSettingsClick: () -> Unit) {
                 }
             }
 
-            if (items.isEmpty()) {
+            if (visibleItems.isEmpty()) {
                 item {
                     Text(
-                        text = stringResource(R.string.empty_list),
+                        text = stringResource(
+                            if (status == ItemStatus.TO_BUY) R.string.empty_list else R.string.pantry_screen_empty
+                        ),
                         modifier = Modifier.fillMaxWidth().padding(vertical = 32.dp),
                         textAlign = TextAlign.Center
                     )
                 }
             } else {
-                if (toBuyItems.isNotEmpty()) {
-                    item { SectionHeader(icon = "🛒", title = stringResource(R.string.section_to_buy)) }
-                    groupByCategory(toBuyItems).forEach { (category, categoryItems) ->
-                        item {
-                            CategoryGroup(
-                                category = category,
-                                items = categoryItems,
-                                onTap = { boughtItem ->
+                groupByCategory(visibleItems).forEach { (category, categoryItems) ->
+                    item {
+                        CategoryGroup(
+                            category = category,
+                            items = categoryItems,
+                            onTap = { tappedItem ->
+                                if (status == ItemStatus.TO_BUY) {
                                     val estimatedExpiry =
-                                        FoodCatalog.suggestedExpiryDate(boughtItem.name, boughtItem.category)
-                                    viewModel.markAsBought(boughtItem, estimatedExpiry)
-                                },
-                                onLongPress = { itemEditing = it }
-                            )
-                        }
-                    }
-                }
-                if (pantryItems.isNotEmpty()) {
-                    if (toBuyItems.isNotEmpty()) {
-                        item {
-                            HorizontalDivider(
-                                modifier = Modifier.padding(top = 24.dp),
-                                thickness = 2.dp,
-                                color = MaterialTheme.colorScheme.primaryContainer
-                            )
-                        }
-                    }
-                    item { SectionHeader(icon = "🏠", title = stringResource(R.string.section_in_pantry)) }
-                    groupByCategory(pantryItems).forEach { (category, categoryItems) ->
-                        item {
-                            CategoryGroup(
-                                category = category,
-                                items = categoryItems,
-                                onTap = { viewModel.markAsFinished(it) },
-                                onLongPress = { itemEditing = it }
-                            )
-                        }
+                                        FoodCatalog.suggestedExpiryDate(tappedItem.name, tappedItem.category)
+                                    viewModel.markAsBought(tappedItem, estimatedExpiry)
+                                } else {
+                                    viewModel.markAsFinished(tappedItem)
+                                }
+                            },
+                            onLongPress = { itemEditing = it }
+                        )
                     }
                 }
             }
@@ -243,14 +234,4 @@ private fun SuggestedSection(
             }
         }
     }
-}
-
-@Composable
-private fun SectionHeader(icon: String, title: String) {
-    Text(
-        text = "$icon $title",
-        style = MaterialTheme.typography.titleMedium,
-        fontWeight = FontWeight.Bold,
-        modifier = Modifier.padding(top = 16.dp, bottom = 8.dp)
-    )
 }

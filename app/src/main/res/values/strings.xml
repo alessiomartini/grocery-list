@@ -2,7 +2,6 @@
 <resources>
     <string name="app_name">Pantry</string>
 
-    <string name="nav_list">List</string>
     <string name="nav_expiry">Expiry</string>
     <string name="nav_recipes">Recipes</string>
     <string name="nav_settings">Settings</string>
@@ -10,6 +9,7 @@
     <string name="section_to_buy">To buy</string>
     <string name="section_in_pantry">In pantry</string>
     <string name="empty_list">No items yet. Tap + to add one.</string>
+    <string name="pantry_screen_empty">Your pantry is empty. Buy something to see it here.</string>
     <string name="suggested_section_title">Suggested</string>
 
     <string name="add_item">Add item</string>

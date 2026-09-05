@@ -3,8 +3,9 @@ package com.alessiomartini.dispensa.ui
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarMonth
-import androidx.compose.material.icons.filled.Checklist
+import androidx.compose.material.icons.filled.Inventory2
 import androidx.compose.material.icons.filled.Restaurant
+import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -32,9 +33,11 @@ import com.alessiomartini.dispensa.ui.recipes.RecipesViewModel
 import com.alessiomartini.dispensa.ui.settings.SettingsScreen
 import com.alessiomartini.dispensa.ui.settings.SettingsViewModel
 import com.alessiomartini.dispensa.ui.settings.UpdateViewModel
+import com.alessiomartini.dispensa.data.ItemStatus
 
 private object Routes {
-    const val LIST = "list"
+    const val TO_BUY = "to_buy"
+    const val PANTRY = "pantry"
     const val EXPIRY = "expiry"
     const val RECIPES = "recipes"
     const val SETTINGS = "settings"
@@ -43,7 +46,8 @@ private object Routes {
 private data class BottomNavItem(val route: String, val labelRes: Int, val icon: androidx.compose.ui.graphics.vector.ImageVector)
 
 private val bottomNavItems = listOf(
-    BottomNavItem(Routes.LIST, R.string.nav_list, Icons.Filled.Checklist),
+    BottomNavItem(Routes.TO_BUY, R.string.section_to_buy, Icons.Filled.ShoppingCart),
+    BottomNavItem(Routes.PANTRY, R.string.section_in_pantry, Icons.Filled.Inventory2),
     BottomNavItem(Routes.EXPIRY, R.string.nav_expiry, Icons.Filled.CalendarMonth),
     BottomNavItem(Routes.RECIPES, R.string.nav_recipes, Icons.Filled.Restaurant)
 )
@@ -80,14 +84,28 @@ fun DispensaApp(app: DispensaApplication) {
     ) { padding ->
         NavHost(
             navController = navController,
-            startDestination = Routes.LIST,
+            startDestination = Routes.TO_BUY,
             modifier = Modifier.padding(bottom = padding.calculateBottomPadding())
         ) {
-            composable(Routes.LIST) {
+            composable(Routes.TO_BUY) {
                 val viewModel: ListViewModel = viewModel(
                     factory = LambdaViewModelFactory { ListViewModel(app.itemRepository) }
                 )
-                ListScreen(viewModel, onSettingsClick = { navController.navigate(Routes.SETTINGS) })
+                ListScreen(
+                    viewModel,
+                    status = ItemStatus.TO_BUY,
+                    onSettingsClick = { navController.navigate(Routes.SETTINGS) }
+                )
+            }
+            composable(Routes.PANTRY) {
+                val viewModel: ListViewModel = viewModel(
+                    factory = LambdaViewModelFactory { ListViewModel(app.itemRepository) }
+                )
+                ListScreen(
+                    viewModel,
+                    status = ItemStatus.IN_PANTRY,
+                    onSettingsClick = { navController.navigate(Routes.SETTINGS) }
+                )
             }
             composable(Routes.EXPIRY) {
                 val viewModel: ExpiryViewModel = viewModel(

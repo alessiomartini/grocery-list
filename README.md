@@ -6,7 +6,7 @@ Built to replace the "checklist" workflow of Google Keep: when you buy a product
 
 ## Features
 
-- **Keep-style grid list**: "To buy" and "In pantry" sections, items grouped by category. Short tap on an item → changes status (bought/finished, with optional expiry date). Long press → edit name, quantity, unit, category, expiry date, or delete the item.
+- **Keep-style grid list**: separate "To buy" and "In pantry" tabs, items grouped by category. Short tap on an item → changes status (bought/finished, with optional expiry date). Long press → edit name, quantity, unit, category, expiry date, or delete the item.
 - **Expiry**: dedicated screen with all pantry products that have an expiry date, sorted and highlighted (expired / today / within 3 days). Daily push notification if something is about to expire. When you check an item off as bought, the expiry date is estimated **and applied immediately, with no confirmation step**, based on the type of food (e.g. milk ~7 days, pasta ~1 year, fresh chicken ~2 days). To correct the estimate, just long-press → edit expiry.
 - **Recipes**: generates 3 recipe ideas based on what you have in your pantry, using Google's Gemini API, which has a free tier. Requires your own personal API key, entered in Settings.
 - **Purchase history**: every time you check an item off as bought it's recorded in a separate purchase history (kept even if you later edit or delete the item). The stats derived from it (how many times you buy each thing, roughly how often) aren't in the app, but on a companion site — see below.
@@ -69,7 +69,7 @@ app/src/main/java/com/alessiomartini/dispensa/
 ├── network/           Call to the Gemini API for recipes
 ├── notifications/     Daily worker + expiry notifications
 └── ui/
-    ├── list/          "List" screen (to-buy / in-pantry checklist)
+    ├── list/          "To buy" and "In pantry" screens (share the same grid UI)
     ├── expiry/        "Expiry" screen
     ├── recipes/       "Recipes" screen
     ├── settings/      "Settings" screen
