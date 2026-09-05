@@ -30,8 +30,22 @@ class RecipeSuggestionRepository(
         .readTimeout(60, TimeUnit.SECONDS)
         .build()
 
-    private val json = Json { ignoreUnknownKeys = true }
+    private val json = Json { ignoreUnknownKeys = true; isLenient = true }
     private val jsonMediaType = "application/json; charset=utf-8".toMediaType()
+
+    private val recipeListSchema = GeminiSchema(
+        type = "ARRAY",
+        items = GeminiSchema(
+            type = "OBJECT",
+            properties = mapOf(
+                "title" to GeminiSchema(type = "STRING"),
+                "ingredientsUsed" to GeminiSchema(type = "ARRAY", items = GeminiSchema(type = "STRING")),
+                "missingIngredients" to GeminiSchema(type = "ARRAY", items = GeminiSchema(type = "STRING")),
+                "steps" to GeminiSchema(type = "ARRAY", items = GeminiSchema(type = "STRING"))
+            ),
+            required = listOf("title", "ingredientsUsed", "missingIngredients", "steps")
+        )
+    )
 
     suspend fun suggestRecipes(pantryItemNames: List<String>): RecipeResult =
         withContext(Dispatchers.IO) {
@@ -44,8 +58,9 @@ class RecipeSuggestionRepository(
                 GeminiRequest(
                     contents = listOf(GeminiContent(role = "user", parts = listOf(GeminiPart(prompt)))),
                     generationConfig = GeminiGenerationConfig(
-                        maxOutputTokens = 1500,
-                        responseMimeType = "application/json"
+                        maxOutputTokens = 2048,
+                        responseMimeType = "application/json",
+                        responseSchema = recipeListSchema
                     )
                 )
             )
@@ -68,10 +83,20 @@ class RecipeSuggestionRepository(
                     }
 
                     val parsed = json.decodeFromString(GeminiResponse.serializer(), bodyString)
-                    val text = parsed.candidates.firstOrNull()?.content?.parts?.firstOrNull()?.text
+                    val candidate = parsed.candidates.firstOrNull()
+                    val text = candidate?.content?.parts?.firstOrNull()?.text
                         ?: return@withContext RecipeResult.Error("Empty response from the model")
 
-                    val recipes = parseRecipes(text)
+                    val recipes = try {
+                        parseRecipes(text)
+                    } catch (e: Exception) {
+                        if (candidate.finishReason == "MAX_TOKENS") {
+                            return@withContext RecipeResult.Error(
+                                "The response got cut off before finishing - try again with fewer pantry items"
+                            )
+                        }
+                        throw e
+                    }
                     RecipeResult.Success(recipes)
                 }
             } catch (e: IOException) {

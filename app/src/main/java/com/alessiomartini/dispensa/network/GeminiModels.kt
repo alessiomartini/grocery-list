@@ -22,7 +22,22 @@ data class GeminiPart(
 @Serializable
 data class GeminiGenerationConfig(
     val maxOutputTokens: Int? = null,
-    val responseMimeType: String? = null
+    val responseMimeType: String? = null,
+    val responseSchema: GeminiSchema? = null
+)
+
+/**
+ * Subset of the OpenAPI schema Gemini's structured-output mode accepts. Passing this makes the
+ * model do constrained decoding against the exact shape instead of free-form JSON, which is what
+ * actually prevents malformed output (e.g. an unescaped quote inside a title breaking the parser)
+ * - responseMimeType alone only asks for JSON, it doesn't enforce a shape.
+ */
+@Serializable
+data class GeminiSchema(
+    val type: String,
+    val items: GeminiSchema? = null,
+    val properties: Map<String, GeminiSchema>? = null,
+    val required: List<String>? = null
 )
 
 @Serializable
