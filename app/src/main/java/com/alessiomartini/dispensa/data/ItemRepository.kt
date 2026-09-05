@@ -79,6 +79,12 @@ class ItemRepository(private val dao: ItemDao, private val purchaseHistoryDao: P
 
     suspend fun delete(item: GroceryItem) = dao.delete(item)
 
+    /**
+     * Writes back an exact prior snapshot of the item - used to undo a mistaken tap. Bypasses
+     * the purchase-history logging in [markAsBought] since undoing isn't a real purchase.
+     */
+    suspend fun restoreSnapshot(item: GroceryItem) = dao.update(item)
+
     suspend fun findItemsExpiringBy(date: LocalDate): List<GroceryItem> =
         dao.findUnnotifiedExpiring(date.toEpochDay())
 

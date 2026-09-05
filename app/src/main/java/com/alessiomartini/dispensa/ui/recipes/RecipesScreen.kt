@@ -10,16 +10,11 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Restaurant
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -30,48 +25,34 @@ import androidx.compose.ui.unit.dp
 import com.alessiomartini.dispensa.R
 import com.alessiomartini.dispensa.network.RecipeSuggestion
 
-@OptIn(ExperimentalMaterial3Api::class)
+/** Header lives in the shared top bar in [com.alessiomartini.dispensa.ui.DispensaApp] - this is just the content. */
 @Composable
-fun RecipesScreen(viewModel: RecipesViewModel, onSettingsClick: () -> Unit) {
+fun RecipesScreen(viewModel: RecipesViewModel) {
     val uiState by viewModel.uiState.collectAsState()
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text(stringResource(R.string.recipes_title)) },
-                actions = {
-                    IconButton(onClick = onSettingsClick) {
-                        Icon(Icons.Filled.Settings, contentDescription = stringResource(R.string.nav_settings))
-                    }
-                }
-            )
-        }
-    ) { padding ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        Button(
+            onClick = { viewModel.suggestRecipes() },
+            modifier = Modifier.fillMaxWidth()
         ) {
-            Button(
-                onClick = { viewModel.suggestRecipes() },
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Icon(Icons.Filled.Restaurant, contentDescription = null)
-                Text(" " + stringResource(R.string.recipes_suggest_button))
-            }
+            Icon(Icons.Filled.Restaurant, contentDescription = null)
+            Text(" " + stringResource(R.string.recipes_suggest_button))
+        }
 
-            when (val state = uiState) {
-                is RecipesUiState.Idle -> Unit
-                is RecipesUiState.Loading -> LoadingState()
-                is RecipesUiState.EmptyPantry -> MessageState(stringResource(R.string.recipes_empty_pantry))
-                is RecipesUiState.NoApiKey -> MessageState(stringResource(R.string.recipes_missing_key))
-                is RecipesUiState.Error -> MessageState(
-                    stringResource(R.string.recipes_error, state.message)
-                )
-                is RecipesUiState.Success -> RecipeList(state.recipes)
-            }
+        when (val state = uiState) {
+            is RecipesUiState.Idle -> Unit
+            is RecipesUiState.Loading -> LoadingState()
+            is RecipesUiState.EmptyPantry -> MessageState(stringResource(R.string.recipes_empty_pantry))
+            is RecipesUiState.NoApiKey -> MessageState(stringResource(R.string.recipes_missing_key))
+            is RecipesUiState.Error -> MessageState(
+                stringResource(R.string.recipes_error, state.message)
+            )
+            is RecipesUiState.Success -> RecipeList(state.recipes)
         }
     }
 }

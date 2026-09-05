@@ -4,6 +4,7 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
@@ -16,22 +17,21 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -42,6 +42,7 @@ import com.alessiomartini.dispensa.data.FoodCatalog
 import com.alessiomartini.dispensa.data.FoodCatalogItem
 import com.alessiomartini.dispensa.data.GroceryItem
 import com.alessiomartini.dispensa.data.ItemStatus
+import kotlinx.coroutines.launch
 
 private val categoryOrderIndex: Map<String, Int> =
     Categories.SUGGESTED.withIndex().associate { (index, category) -> category to index }
@@ -51,48 +52,44 @@ private fun groupByCategory(items: List<GroceryItem>): List<Pair<String, List<Gr
         .toList()
         .sortedBy { (category, _) -> categoryOrderIndex[category] ?: Int.MAX_VALUE }
 
-/** Shared screen for the "To buy" and "In pantry" tabs - same data, filtered to one [status]. */
-@OptIn(ExperimentalMaterial3Api::class)
+/**
+ * Shared screen for the "To buy" and "In pantry" tabs - same data, filtered to one [status].
+ * Header lives in the shared top bar in [com.alessiomartini.dispensa.ui.DispensaApp] - this is
+ * just the content, plus the add-item FAB (only relevant for "To buy").
+ */
 @Composable
-fun ListScreen(viewModel: ListViewModel, status: ItemStatus, onSettingsClick: () -> Unit) {
+fun ListScreen(viewModel: ListViewModel, status: ItemStatus, snackbarHostState: SnackbarHostState) {
     val items by viewModel.items.collectAsState()
-    val dismissedSuggestions by viewModel.dismissedSuggestions.collectAsState()
+    val suggestedItems by viewModel.suggestions.collectAsState()
     var showAddDialog by remember { mutableStateOf(false) }
     var itemEditing by remember { mutableStateOf<GroceryItem?>(null) }
+    val scope = rememberCoroutineScope()
+    val undoLabel = stringResource(R.string.undo_action)
+    val markedBoughtTemplate = stringResource(R.string.item_marked_bought)
+    val markedFinishedTemplate = stringResource(R.string.item_marked_finished)
 
     val visibleItems = items.filter { it.status == status }
-    val suggestedItems = if (status == ItemStatus.TO_BUY) {
-        FoodCatalog.quickAddCandidates(items.map { it.name } + dismissedSuggestions)
-    } else {
-        emptyList()
-    }
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        stringResource(
-                            if (status == ItemStatus.TO_BUY) R.string.section_to_buy else R.string.section_in_pantry
-                        )
-                    )
-                },
-                actions = {
-                    IconButton(onClick = onSettingsClick) {
-                        Icon(Icons.Filled.Settings, contentDescription = stringResource(R.string.nav_settings))
-                    }
-                }
-            )
-        },
-        floatingActionButton = {
-            if (status == ItemStatus.TO_BUY) {
-                FloatingActionButton(onClick = { showAddDialog = true }) {
-                    Icon(Icons.Filled.Add, contentDescription = stringResource(R.string.add_item))
-                }
+    fun onTap(tappedItem: GroceryItem) {
+        val message: String
+        if (status == ItemStatus.TO_BUY) {
+            val estimatedExpiry = FoodCatalog.suggestedExpiryDate(tappedItem.name, tappedItem.category)
+            viewModel.markAsBought(tappedItem, estimatedExpiry)
+            message = markedBoughtTemplate.format(tappedItem.name)
+        } else {
+            viewModel.markAsFinished(tappedItem)
+            message = markedFinishedTemplate.format(tappedItem.name)
+        }
+        scope.launch {
+            val result = snackbarHostState.showSnackbar(message = message, actionLabel = undoLabel)
+            if (result == SnackbarResult.ActionPerformed) {
+                viewModel.restoreItem(tappedItem)
             }
         }
-    ) { padding ->
-        LazyColumn(modifier = Modifier.fillMaxSize().padding(padding).padding(horizontal = 16.dp)) {
+    }
+
+    Box(modifier = Modifier.fillMaxSize()) {
+        LazyColumn(modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp)) {
             if (suggestedItems.isNotEmpty()) {
                 item {
                     SuggestedSection(
@@ -126,19 +123,20 @@ fun ListScreen(viewModel: ListViewModel, status: ItemStatus, onSettingsClick: ()
                         CategoryGroup(
                             category = category,
                             items = categoryItems,
-                            onTap = { tappedItem ->
-                                if (status == ItemStatus.TO_BUY) {
-                                    val estimatedExpiry =
-                                        FoodCatalog.suggestedExpiryDate(tappedItem.name, tappedItem.category)
-                                    viewModel.markAsBought(tappedItem, estimatedExpiry)
-                                } else {
-                                    viewModel.markAsFinished(tappedItem)
-                                }
-                            },
+                            onTap = ::onTap,
                             onLongPress = { itemEditing = it }
                         )
                     }
                 }
+            }
+        }
+
+        if (status == ItemStatus.TO_BUY) {
+            FloatingActionButton(
+                onClick = { showAddDialog = true },
+                modifier = Modifier.align(Alignment.BottomEnd).padding(16.dp)
+            ) {
+                Icon(Icons.Filled.Add, contentDescription = stringResource(R.string.add_item))
             }
         }
     }

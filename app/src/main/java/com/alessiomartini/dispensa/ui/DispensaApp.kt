@@ -9,8 +9,11 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Inventory2
 import androidx.compose.material.icons.filled.Restaurant
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.ShoppingCart
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
@@ -18,6 +21,7 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -67,6 +71,14 @@ private val bottomNavItems = listOf(
     BottomNavItem(Pages.RECIPES, R.string.nav_recipes, Icons.Filled.Restaurant)
 )
 
+/** Per-page title shown in the shared top bar, indexed like [Pages]. */
+private val pageTitles = listOf(
+    R.string.section_to_buy,
+    R.string.section_in_pantry,
+    R.string.nav_expiry,
+    R.string.recipes_title
+)
+
 @Composable
 fun DispensaApp(app: DispensaApplication) {
     val navController = rememberNavController()
@@ -87,8 +99,11 @@ fun DispensaApp(app: DispensaApplication) {
     }
 }
 
-/** The 4 main tabs, swipeable left/right and kept in sync with the bottom nav. */
-@OptIn(ExperimentalFoundationApi::class)
+/**
+ * The 4 main tabs, swipeable left/right and kept in sync with the bottom nav. The header (title +
+ * settings gear) lives here, outside the pager, so it stays put instead of sliding with the swipe.
+ */
+@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
 private fun MainPager(app: DispensaApplication, onSettingsClick: () -> Unit) {
     val pagerState = rememberPagerState(pageCount = { Pages.COUNT })
@@ -115,6 +130,16 @@ private fun MainPager(app: DispensaApplication, onSettingsClick: () -> Unit) {
     }
 
     Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text(stringResource(pageTitles[pagerState.currentPage])) },
+                actions = {
+                    IconButton(onClick = onSettingsClick) {
+                        Icon(Icons.Filled.Settings, contentDescription = stringResource(R.string.nav_settings))
+                    }
+                }
+            )
+        },
         snackbarHost = { SnackbarHost(snackbarHostState) },
         bottomBar = {
             NavigationBar {
@@ -131,26 +156,26 @@ private fun MainPager(app: DispensaApplication, onSettingsClick: () -> Unit) {
     ) { padding ->
         HorizontalPager(
             state = pagerState,
-            modifier = Modifier.fillMaxSize().padding(bottom = padding.calculateBottomPadding())
+            modifier = Modifier.fillMaxSize().padding(padding)
         ) { page ->
             when (page) {
                 Pages.TO_BUY -> {
                     val viewModel: ListViewModel = viewModel(
-                        factory = LambdaViewModelFactory { ListViewModel(app.itemRepository) }
+                        factory = LambdaViewModelFactory { ListViewModel(app.itemRepository, app.settingsRepository) }
                     )
-                    ListScreen(viewModel, status = ItemStatus.TO_BUY, onSettingsClick = onSettingsClick)
+                    ListScreen(viewModel, status = ItemStatus.TO_BUY, snackbarHostState = snackbarHostState)
                 }
                 Pages.PANTRY -> {
                     val viewModel: ListViewModel = viewModel(
-                        factory = LambdaViewModelFactory { ListViewModel(app.itemRepository) }
+                        factory = LambdaViewModelFactory { ListViewModel(app.itemRepository, app.settingsRepository) }
                     )
-                    ListScreen(viewModel, status = ItemStatus.IN_PANTRY, onSettingsClick = onSettingsClick)
+                    ListScreen(viewModel, status = ItemStatus.IN_PANTRY, snackbarHostState = snackbarHostState)
                 }
                 Pages.EXPIRY -> {
                     val viewModel: ExpiryViewModel = viewModel(
                         factory = LambdaViewModelFactory { ExpiryViewModel(app.itemRepository) }
                     )
-                    ExpiryScreen(viewModel, onSettingsClick = onSettingsClick)
+                    ExpiryScreen(viewModel)
                 }
                 Pages.RECIPES -> {
                     val viewModel: RecipesViewModel = viewModel(
@@ -158,7 +183,7 @@ private fun MainPager(app: DispensaApplication, onSettingsClick: () -> Unit) {
                             RecipesViewModel(app.itemRepository, app.recipeSuggestionRepository)
                         }
                     )
-                    RecipesScreen(viewModel, onSettingsClick = onSettingsClick)
+                    RecipesScreen(viewModel)
                 }
             }
         }

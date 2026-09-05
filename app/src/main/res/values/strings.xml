@@ -11,6 +11,9 @@
     <string name="empty_list">No items yet. Tap + to add one.</string>
     <string name="pantry_screen_empty">Your pantry is empty. Buy something to see it here.</string>
     <string name="suggested_section_title">Suggested</string>
+    <string name="undo_action">Undo</string>
+    <string name="item_marked_bought">%1$s marked as bought</string>
+    <string name="item_marked_finished">%1$s marked as finished</string>
 
     <string name="add_item">Add item</string>
     <string name="edit_item">Edit item</string>

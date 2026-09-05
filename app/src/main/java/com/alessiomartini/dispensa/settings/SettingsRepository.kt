@@ -7,6 +7,9 @@ import androidx.security.crypto.MasterKey
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.serialization.builtins.ListSerializer
+import kotlinx.serialization.builtins.serializer
+import kotlinx.serialization.json.Json
 
 data class AppSettings(
     val apiKey: String = "",
@@ -14,7 +17,9 @@ data class AppSettings(
     /** Whether the app should silently check for (and install) newer builds on its own. */
     val autoCheckForUpdates: Boolean = true,
     /** Epoch millis of the last update check, or null if never checked - used to throttle auto-checks. */
-    val lastUpdateCheckAt: Long? = null
+    val lastUpdateCheckAt: Long? = null,
+    /** Names long-pressed off the "Suggested" row; persisted so they don't keep reappearing. */
+    val dismissedSuggestions: Set<String> = emptySet()
 ) {
     companion object {
         const val DEFAULT_MODEL = "gemini-2.0-flash"
@@ -42,6 +47,8 @@ class SettingsRepository(context: Context) {
         )
     }
 
+    private val json = Json { ignoreUnknownKeys = true }
+
     private val _settings = MutableStateFlow(AppSettings())
     val settings: StateFlow<AppSettings> = _settings.asStateFlow()
 
@@ -50,9 +57,16 @@ class SettingsRepository(context: Context) {
             apiKey = prefs.getString(KEY_API_KEY, "") ?: "",
             model = prefs.getString(KEY_MODEL, AppSettings.DEFAULT_MODEL) ?: AppSettings.DEFAULT_MODEL,
             autoCheckForUpdates = prefs.getBoolean(KEY_AUTO_CHECK_UPDATES, true),
-            lastUpdateCheckAt = prefs.getLong(KEY_LAST_UPDATE_CHECK_AT, -1L).takeIf { it >= 0 }
+            lastUpdateCheckAt = prefs.getLong(KEY_LAST_UPDATE_CHECK_AT, -1L).takeIf { it >= 0 },
+            dismissedSuggestions = readDismissedSuggestions()
         )
     }
+
+    private fun readDismissedSuggestions(): Set<String> =
+        prefs.getString(KEY_DISMISSED_SUGGESTIONS, null)
+            ?.let { runCatching { json.decodeFromString(ListSerializer(String.serializer()), it) }.getOrNull() }
+            ?.toSet()
+            ?: emptySet()
 
     fun save(apiKey: String, model: String) {
         prefs.edit()
@@ -75,10 +89,19 @@ class SettingsRepository(context: Context) {
         _settings.value = _settings.value.copy(lastUpdateCheckAt = timestamp)
     }
 
+    fun dismissSuggestion(name: String) {
+        val updated = _settings.value.dismissedSuggestions + name.trim().lowercase()
+        prefs.edit()
+            .putString(KEY_DISMISSED_SUGGESTIONS, json.encodeToString(ListSerializer(String.serializer()), updated.toList()))
+            .apply()
+        _settings.value = _settings.value.copy(dismissedSuggestions = updated)
+    }
+
     companion object {
         private const val KEY_API_KEY = "gemini_api_key"
         private const val KEY_MODEL = "gemini_model"
         private const val KEY_AUTO_CHECK_UPDATES = "auto_check_updates"
         private const val KEY_LAST_UPDATE_CHECK_AT = "last_update_check_at"
+        private const val KEY_DISMISSED_SUGGESTIONS = "dismissed_suggestions"
     }
 }
