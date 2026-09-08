@@ -54,6 +54,7 @@ object FoodCatalog {
         FoodCatalogItem("Butter", "Dairy and eggs", "🧈", 60),
         FoodCatalogItem("Yogurt", "Dairy and eggs", "🥣", 14, listOf("yoghurt")),
         FoodCatalogItem("Cream", "Dairy and eggs", "🥛", 10),
+        FoodCatalogItem("Feta", "Dairy and eggs", "🧀", 30),
 
         // Meat and fish
         FoodCatalogItem("Chicken", "Meat and fish", "🍗", 2),
@@ -67,6 +68,7 @@ object FoodCatalog {
         FoodCatalogItem("Ham", "Meat and fish", "🍖", 5),
         FoodCatalogItem("Tofu", "Meat and fish", "⬜", 7),
         FoodCatalogItem("Schnitzel", "Meat and fish", "🥩", 3),
+        FoodCatalogItem("Tuna", "Meat and fish", "🐟", 730),
 
         // Bread and cereals
         FoodCatalogItem("Bread", "Bread and cereals", "🍞", 5),
@@ -78,6 +80,9 @@ object FoodCatalog {
         FoodCatalogItem("Bagel", "Bread and cereals", "🥯", 5, listOf("bagels")),
         FoodCatalogItem("Croissant", "Bread and cereals", "🥐", 3, listOf("croissants")),
         FoodCatalogItem("Stroopwafel", "Bread and cereals", "🧇", 90, listOf("stroop wafel", "waffle cookie")),
+        FoodCatalogItem("Biscuits", "Bread and cereals", "🍪", 180),
+        FoodCatalogItem("Crackers", "Bread and cereals", "🍘", 180),
+        FoodCatalogItem("Couscous", "Bread and cereals", "🌾", 365, listOf("cous cous")),
 
         // Pantry staples
         FoodCatalogItem("Salt", "Pantry staples", "🧂", 1825),
@@ -93,6 +98,16 @@ object FoodCatalog {
         FoodCatalogItem("Pesto", "Pantry staples", "🌿", 180),
         FoodCatalogItem("Hummus", "Pantry staples", "🫘", 10),
         FoodCatalogItem("Omega 3", "Pantry staples", "💊", 730, listOf("fish oil", "omega-3")),
+        FoodCatalogItem("Broth dice", "Pantry staples", "🍲", 730, listOf("stock cubes", "bouillon")),
+        FoodCatalogItem("Chickpeas", "Pantry staples", "🫘", 730),
+        FoodCatalogItem("Lentils", "Pantry staples", "🫘", 730),
+        FoodCatalogItem("Curry", "Pantry staples", "🍛", 365, listOf("curry powder", "curry paste")),
+        FoodCatalogItem("Mixed nuts", "Pantry staples", "🥜", 180, listOf("nuts")),
+        FoodCatalogItem("Nutella", "Pantry staples", "🍫", 365, listOf("hazelnut spread")),
+        FoodCatalogItem("Pepper", "Pantry staples", "🧂", 1825, listOf("black pepper")),
+        // Canned/frozen corn kernels (e.g. Italian "mais") - kept separate from fresh corn-on-the-cob,
+        // which has a much shorter shelf life.
+        FoodCatalogItem("Corn kernels", "Pantry staples", "🌽", 730, listOf("mais")),
 
         // Frozen foods
         FoodCatalogItem("Ice cream", "Frozen foods", "🍦", 90),
