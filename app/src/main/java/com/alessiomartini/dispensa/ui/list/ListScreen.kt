@@ -20,8 +20,6 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -29,7 +27,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -38,11 +35,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.alessiomartini.dispensa.R
 import com.alessiomartini.dispensa.data.Categories
-import com.alessiomartini.dispensa.data.FoodCatalog
 import com.alessiomartini.dispensa.data.FoodCatalogItem
 import com.alessiomartini.dispensa.data.GroceryItem
 import com.alessiomartini.dispensa.data.ItemStatus
-import kotlinx.coroutines.launch
 
 private val categoryOrderIndex: Map<String, Int> =
     Categories.SUGGESTED.withIndex().associate { (index, category) -> category to index }
@@ -58,35 +53,13 @@ private fun groupByCategory(items: List<GroceryItem>): List<Pair<String, List<Gr
  * just the content, plus the add-item FAB (only relevant for "To buy").
  */
 @Composable
-fun ListScreen(viewModel: ListViewModel, status: ItemStatus, snackbarHostState: SnackbarHostState) {
+fun ListScreen(viewModel: ListViewModel, status: ItemStatus) {
     val items by viewModel.items.collectAsState()
     val suggestedItems by viewModel.suggestions.collectAsState()
     var showAddDialog by remember { mutableStateOf(false) }
     var itemEditing by remember { mutableStateOf<GroceryItem?>(null) }
-    val scope = rememberCoroutineScope()
-    val undoLabel = stringResource(R.string.undo_action)
-    val markedBoughtTemplate = stringResource(R.string.item_marked_bought)
-    val markedFinishedTemplate = stringResource(R.string.item_marked_finished)
 
     val visibleItems = items.filter { it.status == status }
-
-    fun onTap(tappedItem: GroceryItem) {
-        val message: String
-        if (status == ItemStatus.TO_BUY) {
-            val estimatedExpiry = FoodCatalog.suggestedExpiryDate(tappedItem.name, tappedItem.category)
-            viewModel.markAsBought(tappedItem, estimatedExpiry)
-            message = markedBoughtTemplate.format(tappedItem.name)
-        } else {
-            viewModel.markAsFinished(tappedItem)
-            message = markedFinishedTemplate.format(tappedItem.name)
-        }
-        scope.launch {
-            val result = snackbarHostState.showSnackbar(message = message, actionLabel = undoLabel)
-            if (result == SnackbarResult.ActionPerformed) {
-                viewModel.restoreItem(tappedItem)
-            }
-        }
-    }
 
     Box(modifier = Modifier.fillMaxSize()) {
         LazyColumn(modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp)) {
@@ -123,7 +96,7 @@ fun ListScreen(viewModel: ListViewModel, status: ItemStatus, snackbarHostState: 
                         CategoryGroup(
                             category = category,
                             items = categoryItems,
-                            onTap = ::onTap,
+                            onTap = { tappedItem -> viewModel.toggleStatus(tappedItem, status) },
                             onLongPress = { itemEditing = it }
                         )
                     }

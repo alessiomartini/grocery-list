@@ -11,6 +11,7 @@ import androidx.compose.material.icons.filled.Inventory2
 import androidx.compose.material.icons.filled.Restaurant
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.ShoppingCart
+import androidx.compose.material.icons.filled.Undo
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -24,6 +25,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -110,6 +112,24 @@ private fun MainPager(app: DispensaApplication, onSettingsClick: () -> Unit) {
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
 
+    // Hoisted up here (instead of created inline per-page) so the fixed Undo button in the shared
+    // header can act on whichever of these two is currently visible.
+    val toBuyViewModel: ListViewModel = viewModel(
+        key = "to_buy",
+        factory = LambdaViewModelFactory { ListViewModel(app.itemRepository, app.settingsRepository) }
+    )
+    val pantryViewModel: ListViewModel = viewModel(
+        key = "pantry",
+        factory = LambdaViewModelFactory { ListViewModel(app.itemRepository, app.settingsRepository) }
+    )
+    val toBuyLastAction by toBuyViewModel.lastAction.collectAsState()
+    val pantryLastAction by pantryViewModel.lastAction.collectAsState()
+    val canUndo = when (pagerState.currentPage) {
+        Pages.TO_BUY -> toBuyLastAction != null
+        Pages.PANTRY -> pantryLastAction != null
+        else -> false
+    }
+
     val needsPermissionMessage = stringResource(R.string.update_auto_needs_permission)
     val needsPermissionAction = stringResource(R.string.update_auto_needs_permission_action)
     val failedMessageTemplate = stringResource(R.string.update_auto_failed)
@@ -134,6 +154,16 @@ private fun MainPager(app: DispensaApplication, onSettingsClick: () -> Unit) {
             TopAppBar(
                 title = { Text(stringResource(pageTitles[pagerState.currentPage])) },
                 actions = {
+                    if (canUndo) {
+                        IconButton(onClick = {
+                            when (pagerState.currentPage) {
+                                Pages.TO_BUY -> toBuyViewModel.undoLastAction()
+                                Pages.PANTRY -> pantryViewModel.undoLastAction()
+                            }
+                        }) {
+                            Icon(Icons.Filled.Undo, contentDescription = stringResource(R.string.undo_action))
+                        }
+                    }
                     IconButton(onClick = onSettingsClick) {
                         Icon(Icons.Filled.Settings, contentDescription = stringResource(R.string.nav_settings))
                     }
@@ -159,18 +189,8 @@ private fun MainPager(app: DispensaApplication, onSettingsClick: () -> Unit) {
             modifier = Modifier.fillMaxSize().padding(padding)
         ) { page ->
             when (page) {
-                Pages.TO_BUY -> {
-                    val viewModel: ListViewModel = viewModel(
-                        factory = LambdaViewModelFactory { ListViewModel(app.itemRepository, app.settingsRepository) }
-                    )
-                    ListScreen(viewModel, status = ItemStatus.TO_BUY, snackbarHostState = snackbarHostState)
-                }
-                Pages.PANTRY -> {
-                    val viewModel: ListViewModel = viewModel(
-                        factory = LambdaViewModelFactory { ListViewModel(app.itemRepository, app.settingsRepository) }
-                    )
-                    ListScreen(viewModel, status = ItemStatus.IN_PANTRY, snackbarHostState = snackbarHostState)
-                }
+                Pages.TO_BUY -> ListScreen(toBuyViewModel, status = ItemStatus.TO_BUY)
+                Pages.PANTRY -> ListScreen(pantryViewModel, status = ItemStatus.IN_PANTRY)
                 Pages.EXPIRY -> {
                     val viewModel: ExpiryViewModel = viewModel(
                         factory = LambdaViewModelFactory { ExpiryViewModel(app.itemRepository) }
