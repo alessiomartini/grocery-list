@@ -17,6 +17,11 @@ sealed interface RecipeResult {
     data class Error(val message: String) : RecipeResult
 }
 
+enum class RecipeType {
+    MEAL,
+    SNACK
+}
+
 /**
  * Uses the Gemini API (Google AI Studio) to suggest recipes, since it has a genuinely free tier
  * for personal-scale use - see console.aistudio.google.com. Same JSON-array response contract
@@ -47,12 +52,12 @@ class RecipeSuggestionRepository(
         )
     )
 
-    suspend fun suggestRecipes(pantryItemNames: List<String>): RecipeResult =
+    suspend fun suggestRecipes(pantryItemNames: List<String>, type: RecipeType): RecipeResult =
         withContext(Dispatchers.IO) {
             val settings = settingsRepository.settings.value
             if (settings.apiKey.isBlank()) return@withContext RecipeResult.NoApiKey
 
-            val prompt = buildPrompt(pantryItemNames)
+            val prompt = buildPrompt(pantryItemNames, type)
             val requestBody = json.encodeToString(
                 GeminiRequest.serializer(),
                 GeminiRequest(
@@ -119,12 +124,16 @@ class RecipeSuggestionRepository(
         )
     }
 
-    private fun buildPrompt(pantryItemNames: List<String>): String {
+    private fun buildPrompt(pantryItemNames: List<String>, type: RecipeType): String {
         val ingredients = pantryItemNames.joinToString(", ")
+        val recipeKind = when (type) {
+            RecipeType.MEAL -> "full meals (breakfast, lunch, or dinner - something substantial enough to eat as a meal)"
+            RecipeType.SNACK -> "quick snacks or light bites (small, fast to prepare, not a full meal)"
+        }
         return """
             I have these ingredients at home: $ingredients.
 
-            Suggest 3 simple recipes I can make mostly with these ingredients (I can also use
+            Suggest 3 simple $recipeKind I can make mostly with these ingredients (I can also use
             salt, pepper, oil, and water, which you can assume I have). Reply with ONLY a valid
             JSON array (no text before or after, no markdown), where each element has these fields:
             - "title": the recipe's name (string)

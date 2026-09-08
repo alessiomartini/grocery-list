@@ -3,12 +3,15 @@ package com.alessiomartini.dispensa.ui.recipes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.weight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Fastfood
 import androidx.compose.material.icons.filled.Restaurant
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -24,6 +27,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.alessiomartini.dispensa.R
 import com.alessiomartini.dispensa.network.RecipeSuggestion
+import com.alessiomartini.dispensa.network.RecipeType
 
 /** Header lives in the shared top bar in [com.alessiomartini.dispensa.ui.DispensaApp] - this is just the content. */
 @Composable
@@ -36,12 +40,24 @@ fun RecipesScreen(viewModel: RecipesViewModel) {
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        Button(
-            onClick = { viewModel.suggestRecipes() },
-            modifier = Modifier.fillMaxWidth()
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            Icon(Icons.Filled.Restaurant, contentDescription = null)
-            Text(" " + stringResource(R.string.recipes_suggest_button))
+            Button(
+                onClick = { viewModel.suggestRecipes(RecipeType.SNACK) },
+                modifier = Modifier.weight(1f)
+            ) {
+                Icon(Icons.Filled.Fastfood, contentDescription = null)
+                Text(" " + stringResource(R.string.recipes_suggest_snack_button))
+            }
+            Button(
+                onClick = { viewModel.suggestRecipes(RecipeType.MEAL) },
+                modifier = Modifier.weight(1f)
+            ) {
+                Icon(Icons.Filled.Restaurant, contentDescription = null)
+                Text(" " + stringResource(R.string.recipes_suggest_meal_button))
+            }
         }
 
         when (val state = uiState) {

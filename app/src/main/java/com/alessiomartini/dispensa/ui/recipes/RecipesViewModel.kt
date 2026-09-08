@@ -7,6 +7,7 @@ import com.alessiomartini.dispensa.data.ItemStatus
 import com.alessiomartini.dispensa.network.RecipeResult
 import com.alessiomartini.dispensa.network.RecipeSuggestion
 import com.alessiomartini.dispensa.network.RecipeSuggestionRepository
+import com.alessiomartini.dispensa.network.RecipeType
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -30,7 +31,7 @@ class RecipesViewModel(
     private val _uiState = MutableStateFlow<RecipesUiState>(RecipesUiState.Idle)
     val uiState: StateFlow<RecipesUiState> = _uiState.asStateFlow()
 
-    fun suggestRecipes() {
+    fun suggestRecipes(type: RecipeType) {
         viewModelScope.launch {
             _uiState.value = RecipesUiState.Loading
 
@@ -43,7 +44,7 @@ class RecipesViewModel(
                 return@launch
             }
 
-            _uiState.value = when (val result = recipeSuggestionRepository.suggestRecipes(pantryItemNames)) {
+            _uiState.value = when (val result = recipeSuggestionRepository.suggestRecipes(pantryItemNames, type)) {
                 is RecipeResult.Success -> RecipesUiState.Success(result.recipes)
                 is RecipeResult.NoApiKey -> RecipesUiState.NoApiKey
                 is RecipeResult.Error -> RecipesUiState.Error(result.message)
