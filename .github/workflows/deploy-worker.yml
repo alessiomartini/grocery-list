@@ -1,0 +1,28 @@
+name: Deploy Worker
+
+on:
+  push:
+    paths:
+      - 'backend/**'
+      - '.github/workflows/deploy-worker.yml'
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Il token di sincronizzazione viene ricaricato come secret del Worker a ogni deploy,
+      # cosi' l'unica copia da tenere aggiornata e' quella nei secret di GitHub.
+      - name: Deploy to Cloudflare Workers
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          workingDirectory: backend
+          secrets: |
+            SYNC_TOKEN
+        env:
+          SYNC_TOKEN: ${{ secrets.PANTRY_SYNC_TOKEN }}

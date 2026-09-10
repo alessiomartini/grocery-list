@@ -1,0 +1,10 @@
+name = "pantry-api"
+main = "src/worker.js"
+compatibility_date = "2026-09-10"
+
+# SYNC_TOKEN non sta qui: e' un secret, caricato dal workflow di deploy.
+
+[[d1_databases]]
+binding = "DB"
+database_name = "pantry"
+database_id = "304753e7-1c2a-41fd-af5d-5d2f21ff8c81"

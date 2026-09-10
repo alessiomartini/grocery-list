@@ -2,6 +2,11 @@ name: Build APK
 
 on:
   push:
+    # Un push al solo backend non cambia l'APK: senza questo filtro ripubblicherebbe comunque
+    # la release "latest", e il telefono segnalerebbe un aggiornamento che non esiste.
+    paths-ignore:
+      - 'backend/**'
+      - '.github/workflows/deploy-worker.yml'
   pull_request:
   workflow_dispatch:
 
