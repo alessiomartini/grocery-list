@@ -78,7 +78,7 @@ app/src/main/java/com/alessiomartini/dispensa/
 
 ## Possible future improvements
 
-- Barcode/receipt scanning to add products faster.
-- Pantry backup/restore to Google Drive or similar (so it doesn't get lost like it did with Keep).
-- Minimum quantities per category ("tell me when milk runs out two times in a row").
-- Home screen widget for the shopping list.
+Barcode/receipt scanning, Drive backup/restore, per-category minimum quantities, a
+home screen widget — see [`FUTURE-ARCHITECTURE.md`](./FUTURE-ARCHITECTURE.md) for
+details on these and other open ideas, half-done bits, and explicit "not doing
+this" decisions.
