@@ -15,9 +15,15 @@ import com.alessiomartini.dispensa.notifications.ExpiryCheckWorker
 import com.alessiomartini.dispensa.notifications.NotificationHelper
 import com.alessiomartini.dispensa.settings.SettingsRepository
 import com.alessiomartini.dispensa.sync.SyncWorker
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
 
 class DispensaApplication : Application() {
+
+    private val applicationScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     val database: AppDatabase by lazy { AppDatabase.getInstance(this) }
     val itemRepository: ItemRepository by lazy {
@@ -37,6 +43,8 @@ class DispensaApplication : Application() {
         NotificationHelper.ensureChannel(this)
         scheduleExpiryChecks()
         scheduleSync()
+        // Cheap (only items still under "Other"), and picks up catalog additions shipped in updates.
+        applicationScope.launch { itemRepository.recategorizeUncategorized() }
     }
 
     private fun scheduleExpiryChecks() {

@@ -91,6 +91,22 @@ class ItemRepository(private val dao: ItemDao, private val purchaseHistoryDao: P
      */
     suspend fun restoreSnapshot(item: GroceryItem) = dao.update(item.copy(updatedAt = Instant.now()))
 
+    /**
+     * A category is stored when an item is added, so anything added before [FoodCatalog] learned
+     * its name stays under [Categories.DEFAULT] forever - even though its icon, looked up live,
+     * already shows the catalog knows it. Moves those into the catalog's category.
+     *
+     * Only DEFAULT is touched: any other category is either the catalog's own guess or one the
+     * user picked, and neither should be overridden. (Someone who deliberately files a known food
+     * under "Other" will see it moved back; that's the price of not tracking manual edits.)
+     */
+    suspend fun recategorizeUncategorized() {
+        for (item in dao.findInCategory(Categories.DEFAULT)) {
+            val category = FoodCatalog.categoryFor(item.name)?.takeIf { it != Categories.DEFAULT } ?: continue
+            dao.update(item.copy(category = category, updatedAt = Instant.now()))
+        }
+    }
+
     suspend fun findItemsExpiringBy(date: LocalDate): List<GroceryItem> =
         dao.findUnnotifiedExpiring(date.toEpochDay())
 

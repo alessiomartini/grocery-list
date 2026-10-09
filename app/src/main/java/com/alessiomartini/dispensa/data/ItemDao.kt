@@ -23,6 +23,9 @@ interface ItemDao {
     @Query("UPDATE grocery_items SET expiryNotified = 1 WHERE id IN (:ids)")
     suspend fun markNotified(ids: List<Long>)
 
+    @Query("SELECT * FROM grocery_items WHERE deleted = 0 AND category = :category")
+    suspend fun findInCategory(category: String): List<GroceryItem>
+
     @Query("SELECT * FROM grocery_items WHERE uuid = :uuid LIMIT 1")
     suspend fun findByUuid(uuid: String): GroceryItem?
 
