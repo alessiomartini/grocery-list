@@ -2,6 +2,7 @@ package com.alessiomartini.dispensa.data
 
 import android.content.ContentValues
 import android.content.Context
+import android.database.sqlite.SQLiteDatabase
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
@@ -72,7 +73,7 @@ abstract class AppDatabase : RoomDatabase() {
                         }
                         db.update(
                             table,
-                            SupportSQLiteDatabase.CONFLICT_ABORT,
+                            SQLiteDatabase.CONFLICT_ABORT,
                             values,
                             "id = ?",
                             arrayOf<Any?>(cursor.getLong(idIndex))
