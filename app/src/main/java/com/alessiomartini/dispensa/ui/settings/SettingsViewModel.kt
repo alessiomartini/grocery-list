@@ -16,4 +16,8 @@ class SettingsViewModel(private val repository: SettingsRepository) : ViewModel(
     fun setAutoCheckForUpdates(enabled: Boolean) {
         repository.setAutoCheckForUpdates(enabled)
     }
+
+    fun saveSync(url: String, token: String) {
+        repository.saveSync(url, token)
+    }
 }

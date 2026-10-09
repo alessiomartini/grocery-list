@@ -6,6 +6,8 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
@@ -40,12 +42,17 @@ import androidx.compose.ui.unit.dp
 import com.alessiomartini.dispensa.BuildConfig
 import com.alessiomartini.dispensa.R
 import kotlinx.coroutines.launch
+import java.time.Instant
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
+import java.time.format.FormatStyle
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(
     viewModel: SettingsViewModel,
     updateViewModel: UpdateViewModel,
+    syncViewModel: SyncViewModel,
     onBack: () -> Unit
 ) {
     val settings by viewModel.settings.collectAsState()
@@ -55,6 +62,7 @@ fun SettingsScreen(
     val scope = rememberCoroutineScope()
     val savedMessage = stringResource(R.string.settings_saved)
     val updateState by updateViewModel.uiState.collectAsState()
+    val syncState by syncViewModel.uiState.collectAsState()
 
     LaunchedEffect(updateState) {
         if (updateState is UpdateUiState.ReadyToInstall) {
@@ -79,6 +87,7 @@ fun SettingsScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
+                .verticalScroll(rememberScrollState())
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
@@ -117,9 +126,97 @@ fun SettingsScreen(
                 autoCheckForUpdates = settings.autoCheckForUpdates,
                 onAutoCheckForUpdatesChange = viewModel::setAutoCheckForUpdates
             )
+
+            HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+
+            SyncSection(
+                syncUrl = settings.syncUrl,
+                syncToken = settings.syncToken,
+                lastSyncAt = settings.lastSyncAt,
+                state = syncState,
+                onSave = { url, token ->
+                    viewModel.saveSync(url, token)
+                    scope.launch { snackbarHostState.showSnackbar(savedMessage) }
+                },
+                onSyncNow = syncViewModel::syncNow
+            )
         }
     }
 }
+
+@Composable
+private fun SyncSection(
+    syncUrl: String,
+    syncToken: String,
+    lastSyncAt: Long?,
+    state: SyncUiState,
+    onSave: (String, String) -> Unit,
+    onSyncNow: () -> Unit
+) {
+    var url by remember(syncUrl) { mutableStateOf(syncUrl) }
+    var token by remember(syncToken) { mutableStateOf(syncToken) }
+
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Text(stringResource(R.string.settings_sync_section_title), style = MaterialTheme.typography.titleMedium)
+        Text(
+            stringResource(R.string.settings_sync_description),
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+
+        OutlinedTextField(
+            value = url,
+            onValueChange = { url = it },
+            label = { Text(stringResource(R.string.settings_sync_url_title)) },
+            placeholder = { Text(stringResource(R.string.settings_sync_url_hint)) },
+            singleLine = true,
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        OutlinedTextField(
+            value = token,
+            onValueChange = { token = it },
+            label = { Text(stringResource(R.string.settings_sync_token_title)) },
+            singleLine = true,
+            visualTransformation = PasswordVisualTransformation(),
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            Button(onClick = { onSave(url, token) }) {
+                Text(stringResource(R.string.save))
+            }
+            // Syncs what's saved, not what's typed: unsaved edits to the fields don't apply yet.
+            Button(onClick = onSyncNow, enabled = state !is SyncUiState.Syncing) {
+                Text(stringResource(R.string.settings_sync_button))
+            }
+        }
+
+        if (lastSyncAt != null) {
+            Text(
+                stringResource(R.string.sync_last_attempt, formatDateTime(lastSyncAt)),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+
+        when (state) {
+            is SyncUiState.Idle -> Unit
+            is SyncUiState.Syncing -> LoadingRow(stringResource(R.string.sync_syncing))
+            is SyncUiState.NotConfigured -> Text(stringResource(R.string.sync_not_configured))
+            is SyncUiState.Success -> Text(stringResource(R.string.sync_success, state.itemsSynced, state.purchasesSynced))
+            is SyncUiState.Error -> Text(
+                text = stringResource(R.string.sync_error, state.message),
+                color = Color(0xFFC62828)
+            )
+        }
+    }
+}
+
+private fun formatDateTime(epochMillis: Long): String =
+    DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT)
+        .withZone(ZoneId.systemDefault())
+        .format(Instant.ofEpochMilli(epochMillis))
 
 @Composable
 private fun UpdateSection(

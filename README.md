@@ -11,7 +11,8 @@ Built to replace the "checklist" workflow of Google Keep: when you buy a product
 - **Recipes**: generates 3 recipe ideas based on what you have in your pantry, using Google's Gemini API, which has a free tier. Requires your own personal API key, entered in Settings.
 - **Purchase history**: every time you check an item off as bought it's recorded in a separate purchase history (kept even if you later edit or delete the item). The stats derived from it (how many times you buy each thing, roughly how often) aren't in the app, but on a companion site — see below.
 - **Automatic updates**: since the app isn't distributed through the Play Store, it checks its own GitHub build in the background (at most once every ~20h) and downloads + prompts to install newer builds on its own — Android still requires you to tap "Install" on the final confirmation, that step can't be skipped. Can be turned off in Settings, which also has a manual "Check for updates" button. Every push to this repository automatically publishes a new build — no need to create tags or versions by hand.
-- All data (list, pantry, expiry dates, purchase history) stays **on the device**, saved with Room/SQLite. No account, no cloud.
+- All data (list, pantry, expiry dates, purchase history) is saved **on the device** with Room/SQLite, and the phone is always the main copy. No account needed.
+- **Optional sync & backup**: Settings → "Sync & backup" mirrors the pantry to your own Cloudflare Worker + D1 database (`backend/`, see [`backend/README.md`](./backend/README.md)), every hour in the background or on demand. Rows are matched by a stable uuid and the newest write wins; deletions are soft so they propagate too. On a fresh install, entering the same URL and token and tapping "Sync now" pulls everything back — that's the restore path. Off until a URL and token are saved.
 
 ## How to build
 
@@ -66,8 +67,9 @@ Versions before **1.2** were signed with a randomly generated debug key on every
 app/src/main/java/com/alessiomartini/dispensa/
 ├── data/              Room entities, DAO, database, pantry repository
 ├── settings/          Encrypted storage of the API key
-├── network/           Call to the Gemini API for recipes
+├── network/           Gemini API (recipes), GitHub releases (updates), sync API client
 ├── notifications/     Daily worker + expiry notifications
+├── sync/              Hourly background sync worker
 └── ui/
     ├── list/          "To buy" and "In pantry" screens (share the same grid UI)
     ├── expiry/        "Expiry" screen

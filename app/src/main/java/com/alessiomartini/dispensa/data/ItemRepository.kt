@@ -36,7 +36,8 @@ class ItemRepository(private val dao: ItemDao, private val purchaseHistoryDao: P
                 status = ItemStatus.IN_PANTRY,
                 expiryDate = expiryDate,
                 statusChangedAt = Instant.now(),
-                expiryNotified = false
+                expiryNotified = false,
+                updatedAt = Instant.now()
             )
         )
         purchaseHistoryDao.insert(
@@ -51,7 +52,8 @@ class ItemRepository(private val dao: ItemDao, private val purchaseHistoryDao: P
                 status = ItemStatus.TO_BUY,
                 expiryDate = null,
                 statusChangedAt = Instant.now(),
-                expiryNotified = false
+                expiryNotified = false,
+                updatedAt = Instant.now()
             )
         )
     }
@@ -72,22 +74,30 @@ class ItemRepository(private val dao: ItemDao, private val purchaseHistoryDao: P
                 unit = unit.trim(),
                 category = category,
                 expiryDate = expiryDate,
-                expiryNotified = false
+                expiryNotified = false,
+                updatedAt = Instant.now()
             )
         )
     }
 
-    suspend fun delete(item: GroceryItem) = dao.delete(item)
+    /** Soft delete, so the deletion can still be pushed to the sync server - see [GroceryItem.deleted]. */
+    suspend fun delete(item: GroceryItem) = dao.update(item.copy(deleted = true, updatedAt = Instant.now()))
 
     /**
      * Writes back an exact prior snapshot of the item - used to undo a mistaken tap. Bypasses
      * the purchase-history logging in [markAsBought] since undoing isn't a real purchase.
+     * updatedAt is the one field not restored: the undo is itself a new write, and the snapshot's
+     * older timestamp would make a server that already saw the mistaken tap reject it as stale.
      */
-    suspend fun restoreSnapshot(item: GroceryItem) = dao.update(item)
+    suspend fun restoreSnapshot(item: GroceryItem) = dao.update(item.copy(updatedAt = Instant.now()))
 
     suspend fun findItemsExpiringBy(date: LocalDate): List<GroceryItem> =
         dao.findUnnotifiedExpiring(date.toEpochDay())
 
+    /**
+     * Doesn't bump updatedAt: the flag only prevents a repeat notification on this device, so it
+     * isn't worth syncing. At worst another device shows the same expiry notification once.
+     */
     suspend fun markNotified(items: List<GroceryItem>) {
         if (items.isEmpty()) return
         dao.markNotified(items.map { it.id })

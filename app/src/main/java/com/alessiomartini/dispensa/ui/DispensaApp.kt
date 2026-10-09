@@ -47,6 +47,7 @@ import com.alessiomartini.dispensa.ui.recipes.RecipesScreen
 import com.alessiomartini.dispensa.ui.recipes.RecipesViewModel
 import com.alessiomartini.dispensa.ui.settings.SettingsScreen
 import com.alessiomartini.dispensa.ui.settings.SettingsViewModel
+import com.alessiomartini.dispensa.ui.settings.SyncViewModel
 import com.alessiomartini.dispensa.ui.settings.UpdateViewModel
 import kotlinx.coroutines.launch
 
@@ -96,7 +97,10 @@ fun DispensaApp(app: DispensaApplication) {
             val updateViewModel: UpdateViewModel = viewModel(
                 factory = LambdaViewModelFactory { UpdateViewModel(app.updateRepository) }
             )
-            SettingsScreen(viewModel, updateViewModel, onBack = { navController.popBackStack() })
+            val syncViewModel: SyncViewModel = viewModel(
+                factory = LambdaViewModelFactory { SyncViewModel(app.syncRepository) }
+            )
+            SettingsScreen(viewModel, updateViewModel, syncViewModel, onBack = { navController.popBackStack() })
         }
     }
 }

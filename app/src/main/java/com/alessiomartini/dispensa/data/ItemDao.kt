@@ -11,17 +11,24 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface ItemDao {
 
-    @Query("SELECT * FROM grocery_items ORDER BY name COLLATE NOCASE ASC")
+    @Query("SELECT * FROM grocery_items WHERE deleted = 0 ORDER BY name COLLATE NOCASE ASC")
     fun observeAll(): Flow<List<GroceryItem>>
 
-    @Query("SELECT * FROM grocery_items WHERE status = 'IN_PANTRY' AND expiryDate IS NOT NULL ORDER BY expiryDate ASC")
+    @Query("SELECT * FROM grocery_items WHERE deleted = 0 AND status = 'IN_PANTRY' AND expiryDate IS NOT NULL ORDER BY expiryDate ASC")
     fun observePantryWithExpiry(): Flow<List<GroceryItem>>
 
-    @Query("SELECT * FROM grocery_items WHERE status = 'IN_PANTRY' AND expiryDate IS NOT NULL AND expiryDate <= :cutoff AND expiryNotified = 0")
+    @Query("SELECT * FROM grocery_items WHERE deleted = 0 AND status = 'IN_PANTRY' AND expiryDate IS NOT NULL AND expiryDate <= :cutoff AND expiryNotified = 0")
     suspend fun findUnnotifiedExpiring(cutoff: Long): List<GroceryItem>
 
     @Query("UPDATE grocery_items SET expiryNotified = 1 WHERE id IN (:ids)")
     suspend fun markNotified(ids: List<Long>)
+
+    @Query("SELECT * FROM grocery_items WHERE uuid = :uuid LIMIT 1")
+    suspend fun findByUuid(uuid: String): GroceryItem?
+
+    /** Rows changed after [since] (epoch millis), deleted ones included - what a sync push uploads. */
+    @Query("SELECT * FROM grocery_items WHERE updatedAt > :since ORDER BY updatedAt ASC")
+    suspend fun findUpdatedSince(since: Long): List<GroceryItem>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun upsert(item: GroceryItem): Long

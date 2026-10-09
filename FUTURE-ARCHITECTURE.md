@@ -26,11 +26,18 @@ None of these are started; there's no partial branch or scaffolding for them.
 
 ## Left half-done / worth double-checking
 
-- The sync backend is functional (`backend/src/worker.js`, deployed via
-  `.github/workflows/deploy-worker.yml`), but there's no restore-from-server flow
-  in the app UI — sync currently only pushes/pulls incrementally, it isn't
-  presented as a backup/restore feature to the user. See the Google Drive idea
-  above; the existing sync API could arguably be reused for that instead of Drive.
+- The app now syncs with the backend (`network/SyncRepository.kt`, Settings →
+  "Sync & backup", hourly `sync/SyncWorker.kt`). Restoring after a fresh install
+  works by entering the same URL/token and syncing — the first pull starts from
+  watermark 0 — but there's no dedicated "Restore from server" button or
+  wording; it's discoverable only via the README. That probably covers the Google
+  Drive backup idea above without needing Drive.
+- Soft-deleted rows (`deleted = 1`) are never purged, locally or on D1. Harmless
+  at personal scale; a cleanup would have to wait until every device has pulled
+  the deletion, which a single-user app can't really know.
+- Every sync pushes *all* local rows (no push watermark, by design — see the
+  comment on `SyncRepository`). Fine for hundreds to low thousands of rows; revisit
+  only if the purchase history ever grows far beyond that.
 - `backend/README.md` says `npm test` isn't configured and the last-write-wins
   logic is verified manually against the D1 database. There's no automated test
   for `backend/src/worker.js` — worth adding a lightweight test (e.g. against
