@@ -2,8 +2,12 @@ package com.alessiomartini.dispensa.network
 
 import com.alessiomartini.dispensa.settings.SettingsRepository
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.jsonArray
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -70,46 +74,123 @@ class RecipeSuggestionRepository(
                 )
             )
 
-            val request = Request.Builder()
-                .url("$GEMINI_API_BASE_URL/${settings.model}:generateContent")
-                .addHeader("x-goog-api-key", settings.apiKey)
-                .addHeader("content-type", "application/json")
-                .post(requestBody.toRequestBody(jsonMediaType))
-                .build()
+            // The free tier rate-limits each model separately, so when the configured one is
+            // saturated another Flash model usually still answers. A model that no longer exists
+            // (Google retires them) is skipped the same way instead of breaking recipes for good.
+            val models = (listOf(settings.model) + FALLBACK_MODELS)
+                .map { it.trim() }
+                .filter { it.isNotEmpty() }
+                .distinct()
 
-            try {
-                client.newCall(request).execute().use { response ->
-                    val bodyString = response.body?.string().orEmpty()
-                    if (!response.isSuccessful) {
-                        val message = runCatching {
-                            json.decodeFromString(GeminiResponse.serializer(), bodyString).error?.message
-                        }.getOrNull() ?: "HTTP ${response.code}"
-                        return@withContext RecipeResult.Error(message)
-                    }
-
-                    val parsed = json.decodeFromString(GeminiResponse.serializer(), bodyString)
-                    val candidate = parsed.candidates.firstOrNull()
-                    val text = candidate?.content?.parts?.firstOrNull()?.text
-                        ?: return@withContext RecipeResult.Error("Empty response from the model")
-
-                    val recipes = try {
-                        parseRecipes(text)
-                    } catch (e: Exception) {
-                        if (candidate.finishReason == "MAX_TOKENS") {
-                            return@withContext RecipeResult.Error(
-                                "The response got cut off before finishing - try again with fewer pantry items"
-                            )
+            var lastBusyMessage: String? = null
+            var lastMissingModelMessage: String? = null
+            for (model in models) {
+                for (attempt in 1..ATTEMPTS_PER_MODEL) {
+                    when (val result = callModel(model, settings.apiKey, requestBody)) {
+                        is Attempt.Ok -> return@withContext parseResponse(result.body)
+                        is Attempt.Fatal -> return@withContext RecipeResult.Error(result.message)
+                        is Attempt.NoSuchModel -> {
+                            lastMissingModelMessage = result.message
+                            break
                         }
-                        throw e
+                        is Attempt.Busy -> {
+                            lastBusyMessage = result.message
+                            val wait = result.retryAfterMs ?: DEFAULT_RETRY_DELAY_MS
+                            // A long cooldown means the quota is spent for a while: moving on to
+                            // the next model beats leaving the spinner up.
+                            if (attempt == ATTEMPTS_PER_MODEL || wait > MAX_RETRY_DELAY_MS) break
+                            delay(wait)
+                        }
                     }
-                    RecipeResult.Success(recipes)
                 }
-            } catch (e: IOException) {
-                RecipeResult.Error(e.message ?: "Network error")
+            }
+
+            RecipeResult.Error(
+                when {
+                    lastBusyMessage != null ->
+                        "Gemini is busy right now - the free tier only allows a few requests per minute, " +
+                            "and every model tried was at its limit. Wait a minute and try again. ($lastBusyMessage)"
+                    else -> lastMissingModelMessage ?: "No Gemini model available"
+                }
+            )
+        }
+
+    private sealed interface Attempt {
+        data class Ok(val body: String) : Attempt
+        /** Rate-limited (429) or overloaded (5xx): worth retrying, or trying another model. */
+        data class Busy(val message: String, val retryAfterMs: Long?) : Attempt
+        /** 404: this model isn't available to this key (any more) - try the next one. */
+        data class NoSuchModel(val message: String) : Attempt
+        /** Anything else (bad key, bad request, no network): retrying won't help. */
+        data class Fatal(val message: String) : Attempt
+    }
+
+    private fun callModel(model: String, apiKey: String, requestBody: String): Attempt {
+        val request = Request.Builder()
+            .url("$GEMINI_API_BASE_URL/$model:generateContent")
+            .addHeader("x-goog-api-key", apiKey)
+            .addHeader("content-type", "application/json")
+            .post(requestBody.toRequestBody(jsonMediaType))
+            .build()
+
+        return try {
+            client.newCall(request).execute().use { response ->
+                val bodyString = response.body?.string().orEmpty()
+                if (response.isSuccessful) return Attempt.Ok(bodyString)
+
+                val message = runCatching {
+                    json.decodeFromString(GeminiResponse.serializer(), bodyString).error?.message
+                }.getOrNull() ?: "HTTP ${response.code}"
+                when (response.code) {
+                    429, 500, 502, 503, 504 ->
+                        Attempt.Busy(message, retryAfterMs(response.header("Retry-After"), bodyString))
+                    404 -> Attempt.NoSuchModel(message)
+                    else -> Attempt.Fatal(message)
+                }
+            }
+        } catch (e: IOException) {
+            Attempt.Fatal(e.message ?: "Network error")
+        } catch (e: IllegalArgumentException) {
+            // OkHttp rejects a malformed URL, e.g. a model name with spaces typed in Settings.
+            Attempt.Fatal(e.message ?: "Invalid model name")
+        }
+    }
+
+    /**
+     * How long Gemini asks us to wait: the standard Retry-After header if present, otherwise the
+     * google.rpc.RetryInfo it puts in a 429's error details (e.g. "retryDelay": "17s").
+     */
+    private fun retryAfterMs(retryAfterHeader: String?, body: String): Long? {
+        retryAfterHeader?.trim()?.toLongOrNull()?.let { return it * 1000 }
+        return runCatching {
+            json.parseToJsonElement(body).jsonObject["error"]?.jsonObject
+                ?.get("details")?.jsonArray
+                ?.firstNotNullOfOrNull { it.jsonObject["retryDelay"]?.jsonPrimitive?.content }
+                ?.removeSuffix("s")
+                ?.toDouble()
+                ?.let { (it * 1000).toLong() }
+        }.getOrNull()
+    }
+
+    private fun parseResponse(body: String): RecipeResult = try {
+        val candidate = json.decodeFromString(GeminiResponse.serializer(), body).candidates.firstOrNull()
+        val text = candidate?.content?.parts?.firstOrNull()?.text
+        if (text == null) {
+            RecipeResult.Error("Empty response from the model")
+        } else {
+            try {
+                RecipeResult.Success(parseRecipes(text))
             } catch (e: Exception) {
-                RecipeResult.Error(e.message ?: "Unexpected error")
+                if (candidate?.finishReason == "MAX_TOKENS") {
+                    RecipeResult.Error("The response got cut off before finishing - try again with fewer pantry items")
+                } else {
+                    RecipeResult.Error(e.message ?: "Couldn't read the model's answer")
+                }
             }
         }
+    } catch (e: Exception) {
+        RecipeResult.Error(e.message ?: "Unexpected error")
+    }
 
     private fun parseRecipes(rawText: String): List<RecipeSuggestion> {
         val cleaned = rawText
@@ -147,5 +228,11 @@ class RecipeSuggestionRepository(
 
     companion object {
         private const val GEMINI_API_BASE_URL = "https://generativelanguage.googleapis.com/v1beta/models"
+
+        /** Tried in order after the model chosen in Settings; each has its own free-tier quota. */
+        private val FALLBACK_MODELS = listOf("gemini-2.5-flash", "gemini-2.5-flash-lite", "gemini-2.0-flash")
+        private const val ATTEMPTS_PER_MODEL = 2
+        private const val DEFAULT_RETRY_DELAY_MS = 3_000L
+        private const val MAX_RETRY_DELAY_MS = 10_000L
     }
 }
