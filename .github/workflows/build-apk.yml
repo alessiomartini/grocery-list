@@ -26,8 +26,8 @@ jobs:
           distribution: temurin
           java-version: '17'
 
-      - name: Set up Android SDK
-        uses: android-actions/setup-android@v3
+      # ponytail: niente android-actions/setup-android: il suo `sdkmanager --licenses` fallisce (exit 1, ott 2026)
+      # e ubuntu-latest ha già l'SDK Android con le licenze accettate. Rimetterlo se serve un SDK non preinstallato.
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
