@@ -79,6 +79,6 @@ app/src/main/java/com/alessiomartini/dispensa/
 ## Possible future improvements
 
 Barcode/receipt scanning, Drive backup/restore, per-category minimum quantities, a
-home screen widget — see [`FUTURE-ARCHITECTURE.md`](./FUTURE-ARCHITECTURE.md) for
+home screen widget — see [`ROADMAP.md`](./ROADMAP.md) for
 details on these and other open ideas, half-done bits, and explicit "not doing
 this" decisions.
