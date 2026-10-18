@@ -5,7 +5,7 @@
 Android grocery-list app ("Pantry" / `Dispensa`), Kotlin + Jetpack Compose,
 single-user, with a small Cloudflare Worker + D1 backend (`backend/`) for sync.
 Keep app, backend, and shared data responsibilities separate. See `README.md`
-for features/build/publish, and `FUTURE-ARCHITECTURE.md` for open ideas and
+for features/build/publish, and `ROADMAP.md` for open ideas and
 things intentionally not built.
 
 ## Verification
@@ -35,22 +35,25 @@ things intentionally not built.
 - Use fake/seed data for local verification; never use real personal data
   (this app stores real household grocery/pantry data for Alessio).
 - Inspect `git diff` and report the exact Gradle tasks run before committing.
-- Top-level docs (`README.md`, this file, `FUTURE-ARCHITECTURE.md`) are in
+- Top-level docs (`README.md`, this file, `ROADMAP.md`) are in
   English; `backend/` docs and code comments are in Italian — match whichever
   file you're editing, don't convert one to the other.
 - Don't add a public feedback/user-notes feature to this app or its backend —
-  see the "Public feedback" section in `FUTURE-ARCHITECTURE.md` for why.
+  see the "Public feedback" section in `ROADMAP.md` for why.
 
-## Roadmap e progressi
+## Roadmap, idee e progressi
 
-Questo progetto è tracciato in https://alessiomartini.github.io/projects-overview/ tramite il file `ROADMAP.md`
-nella root del repo. Mantienilo aggiornato:
+`ROADMAP.md` nella root è l'**unico** file per todo, idee, decisioni e diario del progetto
+(niente `FUTURE-ARCHITECTURE.md`, `IDEE.md`, `TODO.md`). È letto da https://alessiomartini.github.io/projects-overview/.
+Sezioni: `## <fase>` (checkbox, contano nella percentuale), `## Idee` (checkbox, non contano),
+`## Decisioni e cose provate` (prosa: scartato/rimandato e perché, provato e annullato, limiti e bug noti), `## Log`.
 
 - Alla fine di ogni sessione di lavoro (prima del commit finale), aggiorna `ROADMAP.md`:
   - spunta (`- [x]`) i punti completati in questa sessione;
-  - aggiungi come `- [ ]` i nuovi compiti emersi, nella fase giusta (titoli `##`);
-  - aggiungi in cima alla sezione `## Log` una riga `- AAAA-MM-GG: <cosa è stato fatto, in una frase>`
+  - aggiungi come `- [ ]` i nuovi compiti nella fase giusta, e le idee non decise in `## Idee`;
+  - annota in `## Decisioni e cose provate` ciò che è stato scartato, rimandato o annullato, col perché;
+  - aggiungi in cima a `## Log` una riga `- AAAA-MM-GG: <cosa è stato fatto, in una frase>`
     (se esiste già una riga con la data di oggi, estendila invece di crearne un'altra).
 - Non riscrivere né riordinare le voci esistenti senza motivo; non cancellare le voci completate.
-- Se `ROADMAP.md` non esiste, crealo con le fasi `## ...`, le checkbox e una sezione `## Log`.
+- Se `ROADMAP.md` non esiste, crealo da `templates/ROADMAP.md` di projects-overview.
 - Includi l'aggiornamento di `ROADMAP.md` nello stesso commit del lavoro.
