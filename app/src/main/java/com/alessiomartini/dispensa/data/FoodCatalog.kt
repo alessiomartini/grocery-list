@@ -101,7 +101,6 @@ object FoodCatalog {
         FoodCatalogItem("Puff pastry", "Bread and cereals", "🥐", 14, listOf("pasta sfoglia", "sfoglia", "bladerdeeg")),
 
         // Pantry staples
-        FoodCatalogItem("Salt", "Pantry staples", "🧂", 1825),
         FoodCatalogItem("Sugar", "Pantry staples", "🍯", 730),
         FoodCatalogItem("Olive oil", "Pantry staples", "🫒", 365, listOf("cooking oil")),
         FoodCatalogItem("Vinegar", "Pantry staples", "🍶", 730),
@@ -120,10 +119,8 @@ object FoodCatalog {
         FoodCatalogItem("Broth dice", "Pantry staples", "🍲", 730, listOf("stock cubes", "bouillon")),
         FoodCatalogItem("Chickpeas", "Pantry staples", "🫘", 730),
         FoodCatalogItem("Lentils", "Pantry staples", "🫘", 730),
-        FoodCatalogItem("Curry", "Pantry staples", "🍛", 365, listOf("curry powder", "curry paste")),
         FoodCatalogItem("Mixed nuts", "Pantry staples", "🥜", 180, listOf("nuts")),
         FoodCatalogItem("Nutella", "Pantry staples", "🍫", 365, listOf("hazelnut spread")),
-        FoodCatalogItem("Pepper", "Pantry staples", "🧂", 1825, listOf("black pepper")),
         // Canned/frozen corn kernels (e.g. Italian "mais") - kept separate from fresh corn-on-the-cob,
         // which has a much shorter shelf life.
         FoodCatalogItem("Corn kernels", "Pantry staples", "🌽", 730, listOf("mais")),
@@ -131,6 +128,18 @@ object FoodCatalog {
         FoodCatalogItem("Tahini", "Pantry staples", "🥜", 180, listOf("tahina", "taina", "tahin")),
         FoodCatalogItem("Coconut milk", "Pantry staples", "🥥", 730, listOf("latte di cocco", "kokosmelk")),
         FoodCatalogItem("Mashed potatoes", "Pantry staples", "🥔", 14, listOf("mashed potato")),
+
+        // Herbs and spices (dried; fresh herbs like parsley stay in Fruits and vegetables)
+        FoodCatalogItem("Salt", "Herbs and spices", "🧂", 1825),
+        FoodCatalogItem("Pepper", "Herbs and spices", "🧂", 1825, listOf("black pepper")),
+        FoodCatalogItem("Curry", "Herbs and spices", "🍛", 365, listOf("curry powder", "curry paste")),
+        // Plain "paprika" stays the Dutch word for bell pepper; only the spelled-out spice lands here.
+        FoodCatalogItem("Paprika powder", "Herbs and spices", "🌶️", 730, listOf("smoked paprika", "paprikapoeder")),
+        FoodCatalogItem("Oregano", "Herbs and spices", "🌿", 730, listOf("origano")),
+        FoodCatalogItem("Cinnamon", "Herbs and spices", "🌰", 730, listOf("cannella", "kaneel")),
+        FoodCatalogItem("Cumin", "Herbs and spices", "🌰", 730, listOf("cumino", "komijn")),
+        FoodCatalogItem("Chili flakes", "Herbs and spices", "🌶️", 730, listOf("peperoncino", "chilli flakes")),
+        FoodCatalogItem("Nutmeg", "Herbs and spices", "🌰", 1095, listOf("noce moscata", "nootmuskaat")),
 
         // Frozen foods
         FoodCatalogItem("Ice cream", "Frozen foods", "🍦", 90),
@@ -173,6 +182,7 @@ object FoodCatalog {
         "Meat and fish" to "🍖",
         "Bread and cereals" to "🍞",
         "Pantry staples" to "🥫",
+        "Herbs and spices" to "🧂",
         "Frozen foods" to "🧊",
         "Beverages" to "🥤",
         "Household and hygiene" to "🧴"
@@ -185,6 +195,7 @@ object FoodCatalog {
         "Meat and fish" to 3,
         "Bread and cereals" to 14,
         "Pantry staples" to 180,
+        "Herbs and spices" to 730,
         "Frozen foods" to 120,
         "Beverages" to 180
         // Household and hygiene, Other: no sensible default, left unmapped.

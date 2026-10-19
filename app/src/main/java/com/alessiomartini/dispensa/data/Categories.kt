@@ -9,6 +9,7 @@ object Categories {
         "Meat and fish",
         "Bread and cereals",
         "Pantry staples",
+        "Herbs and spices",
         "Frozen foods",
         "Beverages",
         "Household and hygiene",
