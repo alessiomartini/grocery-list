@@ -117,6 +117,6 @@ in a shared database. **This does not fit Pantry and is not planned:**
   as a plan to build one soon.
 
 ## Log
-- 2026-10-19: sync app↔backend (Room v3 con uuid/updatedAt/soft delete), retry e fallback dei modelli Gemini su 429/503, ricategorizzazione automatica dei prodotti in "Other", fix della CI (pacchetto `tools` di setup-android); risolto il crash da downgrade del database e allineato `main` al branch
+- 2026-10-19: sync app↔backend (Room v3 con uuid/updatedAt/soft delete), retry e fallback dei modelli Gemini su 429/503, ricategorizzazione automatica dei prodotti in "Other", fix della CI (pacchetto `tools` di setup-android); risolto il crash da downgrade del database e allineato `main` al branch; prima sync riuscita (91 prodotti sul server) e catalogo esteso perché li riconosca tutti
 - 2026-10-18: FUTURE-ARCHITECTURE.md unito in ROADMAP.md (protocollo unico)
 - 2026-10-15: creata la roadmap per Projects Overview
