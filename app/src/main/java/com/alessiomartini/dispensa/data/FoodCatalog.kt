@@ -49,8 +49,6 @@ object FoodCatalog {
         FoodCatalogItem("Celery", "Fruits and vegetables", "🥬", 14, listOf("bleekselderij", "sedano")),
         FoodCatalogItem("Leeks", "Fruits and vegetables", "🥬", 10, listOf("leek", "porro", "porri", "prei")),
         FoodCatalogItem("Cauliflower", "Fruits and vegetables", "🥦", 7, listOf("cavolfiore", "bloemkool")),
-        FoodCatalogItem("Parsley", "Fruits and vegetables", "🌿", 7, listOf("prezzemolo", "peterselie")),
-        FoodCatalogItem("Mint", "Fruits and vegetables", "🌿", 7, listOf("menta", "munt")),
 
         // Dairy and eggs
         FoodCatalogItem("Milk", "Dairy and eggs", "🥛", 7),
@@ -129,7 +127,9 @@ object FoodCatalog {
         FoodCatalogItem("Coconut milk", "Pantry staples", "🥥", 730, listOf("latte di cocco", "kokosmelk")),
         FoodCatalogItem("Mashed potatoes", "Pantry staples", "🥔", 14, listOf("mashed potato")),
 
-        // Herbs and spices (dried; fresh herbs like parsley stay in Fruits and vegetables)
+        // Herbs and spices (fresh herbs keep their short shelf life)
+        FoodCatalogItem("Parsley", "Herbs and spices", "🌿", 7, listOf("prezzemolo", "peterselie")),
+        FoodCatalogItem("Mint", "Herbs and spices", "🌿", 7, listOf("menta", "munt")),
         FoodCatalogItem("Salt", "Herbs and spices", "🧂", 1825),
         FoodCatalogItem("Pepper", "Herbs and spices", "🧂", 1825, listOf("black pepper")),
         FoodCatalogItem("Curry", "Herbs and spices", "🍛", 365, listOf("curry powder", "curry paste")),
