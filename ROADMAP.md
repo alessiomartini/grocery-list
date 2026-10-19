@@ -35,6 +35,9 @@ here with a bit more detail so they don't get lost.
 
 None of these are started; there's no partial branch or scaffolding for them.
 
+## Da fare
+- [ ] Categorie e catalogo dal server invece che nel codice: oggi `Categories.SUGGESTED` e `FoodCatalog` (categoria, icona, durata, alias di ogni alimento) sono scritti nell'APK, quindi una categoria nuova o un alimento spostato richiede un aggiornamento dell'app. Le modifiche ai prodotti nel D1 arrivano già col sync; l'obiettivo è che basti un sync anche per categorie e catalogo (es. tabelle `categories`/`catalog` nel D1 scaricate dal Worker, con il catalogo nell'APK come fallback offline)
+
 ## Da verificare
 - [ ] Test del backend di sync (oggi `npm test` non è configurato)
 - [ ] Sync end-to-end dal telefono (Impostazioni → "Sync & backup" → Sync now) contro il Worker vero: finora verificati solo migrazione su SQLite con dati finti e formato JSON contro `validateItem`
@@ -121,6 +124,6 @@ in a shared database. **This does not fit Pantry and is not planned:**
   as a plan to build one soon.
 
 ## Log
-- 2026-10-19: nuova categoria "Herbs and spices" (sale, pepe, curry, prezzemolo, menta e spezie secche nel catalogo); corrette a mano le categorie di 4 prodotti nel D1; sync app↔backend (Room v3 con uuid/updatedAt/soft delete), retry e fallback dei modelli Gemini su 429/503, ricategorizzazione automatica dei prodotti in "Other", fix della CI (pacchetto `tools` di setup-android); risolto il crash da downgrade del database e allineato `main` al branch; prima sync riuscita (91 prodotti sul server) e catalogo esteso perché li riconosca tutti
+- 2026-10-19: todo: categorie e catalogo sincronizzati dal server; nuova categoria "Herbs and spices" (sale, pepe, curry, prezzemolo, menta e spezie secche nel catalogo); corrette a mano le categorie di 4 prodotti nel D1; sync app↔backend (Room v3 con uuid/updatedAt/soft delete), retry e fallback dei modelli Gemini su 429/503, ricategorizzazione automatica dei prodotti in "Other", fix della CI (pacchetto `tools` di setup-android); risolto il crash da downgrade del database e allineato `main` al branch; prima sync riuscita (91 prodotti sul server) e catalogo esteso perché li riconosca tutti
 - 2026-10-18: FUTURE-ARCHITECTURE.md unito in ROADMAP.md (protocollo unico)
 - 2026-10-15: creata la roadmap per Projects Overview
