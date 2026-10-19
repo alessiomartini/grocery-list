@@ -33,6 +33,8 @@ None of these are started; there's no partial branch or scaffolding for them.
 
 ## Da verificare
 - [ ] Test del backend di sync (oggi `npm test` non è configurato)
+- [ ] Sync end-to-end dal telefono (Impostazioni → "Sync & backup" → Sync now) contro il Worker vero: finora verificati solo migrazione su SQLite con dati finti e formato JSON contro `validateItem`
+- [ ] I modelli Gemini di riserva (`gemini-2.5-flash`, `gemini-2.5-flash-lite`, `gemini-2.0-flash`) esistono ancora per la chiave in uso: uno ritirato viene saltato (404), ma se lo fossero tutti le ricette fallirebbero
 
 ## Decisioni e cose provate
 
@@ -58,6 +60,19 @@ explicit "not doing this" decisions with their reasoning — so a future session
   logic is verified manually against the D1 database. There's no automated test
   for `backend/src/worker.js` — worth adding a lightweight test (e.g. against
   `wrangler dev` + a local D1) if the sync logic changes again.
+
+### Database version must never go down between published builds
+
+- Every push to *any* branch republishes the single `latest` release, and the app
+  installs whatever has the higher versionCode. On 2026-10-19 a push to `main`
+  (Room database still v2) was published after the phone already had a build
+  with database v3: Room found a v3 database with no 3→2 migration and the app
+  crashed on every launch. Fixed by republishing from the v3 branch and then
+  fast-forwarding `main` to it.
+- `fallbackToDestructiveMigrationOnDowngrade()` was deliberately **not** added:
+  it would "fix" the crash by wiping the pantry. Keep the published database
+  version monotonic instead — never push to a branch whose Room version is lower
+  than what's already been published.
 
 ### Local verification limitations (this dev environment)
 
@@ -102,5 +117,6 @@ in a shared database. **This does not fit Pantry and is not planned:**
   as a plan to build one soon.
 
 ## Log
+- 2026-10-19: sync app↔backend (Room v3 con uuid/updatedAt/soft delete), retry e fallback dei modelli Gemini su 429/503, ricategorizzazione automatica dei prodotti in "Other", fix della CI (pacchetto `tools` di setup-android); risolto il crash da downgrade del database e allineato `main` al branch
 - 2026-10-18: FUTURE-ARCHITECTURE.md unito in ROADMAP.md (protocollo unico)
 - 2026-10-15: creata la roadmap per Projects Overview
