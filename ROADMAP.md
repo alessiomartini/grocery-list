@@ -1,30 +1,46 @@
-# Future architecture & open ideas
+# Roadmap
+
+<!--
+Unico file per todo, idee, decisioni e diario, letto da Projects Overview
+(https://alessiomartini.github.io/projects-overview/). Protocollo: templates/ROADMAP.md di projects-overview.
+-->
+
+## Idee
+- [ ] Scansione di codici a barre / scontrini
+- [ ] Backup della dispensa su Google Drive
+- [ ] Quantità minime per categoria
+- [ ] Widget per la schermata Home
+
+### Ideas from the README, expanded
+
+These were listed inline in `README.md` under "Possible future improvements"; kept
+here with a bit more detail so they don't get lost.
+
+- [ ] **Barcode/receipt scanning** to add products faster. Would need a camera
+  permission + a barcode/OCR library (e.g. ML Kit) and a lookup step (barcode →
+  product name), which is the hard part since there's no product database wired
+  up yet.
+- [ ] **Pantry backup/restore to Google Drive** or similar, so data survives a phone
+  reset/loss the way it didn't with Google Keep. The sync backend (`backend/`)
+  already gives a server-side copy, but it's not framed as a restorable backup
+  from the UI (no "restore from server" flow after a fresh install).
+- [ ] **Minimum quantities per category** ("tell me when milk runs out two times in a
+  row") — needs tracking consumption streaks per category, not just per item.
+- [ ] **Home screen widget** for the shopping list — a Glance/AppWidget target,
+  independent of the rest of the app.
+
+None of these are started; there's no partial branch or scaffolding for them.
+
+## Da verificare
+- [ ] Test del backend di sync (oggi `npm test` non è configurato)
+
+## Decisioni e cose provate
 
 This file collects ideas that are not implemented yet, things left half-done, and
 explicit "not doing this" decisions with their reasoning — so a future session
 (human or Claude Code) doesn't have to rediscover the context.
 
-## Ideas from the README, expanded
-
-These were listed inline in `README.md` under "Possible future improvements"; kept
-here with a bit more detail so they don't get lost.
-
-- **Barcode/receipt scanning** to add products faster. Would need a camera
-  permission + a barcode/OCR library (e.g. ML Kit) and a lookup step (barcode →
-  product name), which is the hard part since there's no product database wired
-  up yet.
-- **Pantry backup/restore to Google Drive** or similar, so data survives a phone
-  reset/loss the way it didn't with Google Keep. The sync backend (`backend/`)
-  already gives a server-side copy, but it's not framed as a restorable backup
-  from the UI (no "restore from server" flow after a fresh install).
-- **Minimum quantities per category** ("tell me when milk runs out two times in a
-  row") — needs tracking consumption streaks per category, not just per item.
-- **Home screen widget** for the shopping list — a Glance/AppWidget target,
-  independent of the rest of the app.
-
-None of these are started; there's no partial branch or scaffolding for them.
-
-## Left half-done / worth double-checking
+### Left half-done / worth double-checking
 
 - The app now syncs with the backend (`network/SyncRepository.kt`, Settings →
   "Sync & backup", hourly `sync/SyncWorker.kt`). Restoring after a fresh install
@@ -43,7 +59,7 @@ None of these are started; there's no partial branch or scaffolding for them.
   for `backend/src/worker.js` — worth adding a lightweight test (e.g. against
   `wrangler dev` + a local D1) if the sync logic changes again.
 
-## Local verification limitations (this dev environment)
+### Local verification limitations (this dev environment)
 
 - `./gradlew.bat help` fails here with just `25.0.2` as the error (Gradle/AGP
   8.5.2 doesn't support running on JDK 25 — it needs JDK 17, per the Android
@@ -61,7 +77,7 @@ None of these are started; there's no partial branch or scaffolding for them.
   `devDependencies` fields — it only uses `npx wrangler` from CI), so there was
   nothing to run `npm outdated` against.
 
-## Public feedback / notes-from-users feature — intentionally not added
+### Public feedback / notes-from-users feature — intentionally not added
 
 This project's docs mention a general idea (used as a template across repos) of
 adding a lightweight public feedback feature — e.g. site visitors leaving notes
@@ -84,3 +100,7 @@ in a shared database. **This does not fit Pantry and is not planned:**
   very-low-priority idea, not a task on any roadmap; there is currently no
   `notes` table, endpoint, or UI screen for it, and nothing here should be read
   as a plan to build one soon.
+
+## Log
+- 2026-10-18: FUTURE-ARCHITECTURE.md unito in ROADMAP.md (protocollo unico)
+- 2026-10-15: creata la roadmap per Projects Overview
