@@ -6,6 +6,7 @@ Unico file per todo, idee, decisioni e diario, letto da Projects Overview
 -->
 
 ## Idee
+- [ ] Dal brief del mattino: se in Google Tasks c'è un task tipo "aggiungi alimento alla lista della spesa", il brief lo legge e aggiorna la lista nell'app. Parole di Alessio: "voglio implementare la funzione che se c'e' qualcosa nei tasks che dice "aggiungi alimento alla liste della spesa" allora il brief prende l'istruzione e modifica la lista nell'app Pantry" (da google-tasks, task "Fare la spesa e compilare la lista della spesa", 2026-11-07)
 - [ ] Scansione di codici a barre / scontrini
 - [ ] Backup della dispensa su Google Drive
 - [ ] Quantità minime per categoria
