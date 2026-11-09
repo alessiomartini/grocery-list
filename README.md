@@ -6,7 +6,8 @@ Built to replace the "checklist" workflow of Google Keep: when you buy a product
 
 ## Features
 
-- **Keep-style grid list**: separate "To buy" and "In pantry" tabs (swipe left/right between all 4 tabs, or use the bottom nav), items grouped by category. Short tap on an item → changes status (bought/finished, with optional expiry date). Long press → edit name, quantity, unit, category, expiry date, or delete the item.
+- **Keep-style grid list**: separate "To buy" and "In pantry" tabs (swipe left/right between all 4 tabs, or use the bottom nav), items grouped by category. Short tap on an item → changes status (bought/finished, with optional expiry date). Long press → edit name, category, expiry date, or delete the item.
+- **Names in two languages and Dutch seasonality**: known products show their names in the languages set in Settings → "Name languages" (default Italian + Dutch, e.g. "Latte / Melk"; en/it/nl available). Known fruit and vegetables carry an "In season (NL)" / "Out of season (NL)" tag from a static month table (`data/FoodInfo.kt`, based on the Milieu Centraal calendar). Per-product quantity was removed.
 - **Expiry**: dedicated screen with all pantry products that have an expiry date, sorted and highlighted (expired / today / within 3 days). Daily push notification if something is about to expire. When you check an item off as bought, the expiry date is estimated **and applied immediately, with no confirmation step**, based on the type of food (e.g. milk ~7 days, pasta ~1 year, fresh chicken ~2 days). To correct the estimate, just long-press → edit expiry.
 - **Recipes**: generates 3 recipe ideas based on what you have in your pantry, using Google's Gemini API, which has a free tier. Requires your own personal API key, entered in Settings.
 - **Purchase history**: every time you check an item off as bought it's recorded in a separate purchase history (kept even if you later edit or delete the item). The stats derived from it (how many times you buy each thing, roughly how often) aren't in the app, but on a companion site — see below.
@@ -33,6 +34,10 @@ The generated APK is located at `app/build/outputs/apk/debug/`.
 The `.github/workflows/build-apk.yml` workflow builds the app and runs its tests on every push, on GitHub Actions — not in the remote development environment used to write the code, which has no access to the Android SDK. This is how the code gets verified: [![Build APK](https://github.com/alessiomartini/grocery-list/actions/workflows/build-apk.yml/badge.svg)](https://github.com/alessiomartini/grocery-list/actions/workflows/build-apk.yml)
 
 **Every push to a branch** (not pull requests) also automatically publishes the APK as a [GitHub Release tagged `latest`](https://github.com/alessiomartini/grocery-list/releases/tag/latest), overwriting the previous one — no manual tag to create. `versionCode`/`versionName` are set by the CI based on the workflow's run number (`APP_VERSION_CODE`/`APP_VERSION_NAME`, read from `app/build.gradle.kts` via environment variables), so every published build has a unique, increasing version.
+
+## Editing the list from the computer
+
+`python tools/pantry.py list|add "Milk"|remove "Milk"` writes to the same Worker/D1 the app syncs with (needs `PANTRY_URL` and `PANTRY_TOKEN`, the values from Settings → Sync & backup; can sit in the git-ignored `tools/.env`). The app picks changes up with its hourly background sync, no app update involved.
 
 ## Setting up recipes (free Gemini API key)
 
