@@ -14,15 +14,11 @@ class ItemRepository(private val dao: ItemDao, private val purchaseHistoryDao: P
 
     suspend fun addToShoppingList(
         name: String,
-        quantity: Int,
-        unit: String,
         category: String
     ) {
         dao.upsert(
             GroceryItem(
                 name = name.trim(),
-                quantity = quantity,
-                unit = unit.trim(),
                 category = category,
                 status = ItemStatus.TO_BUY
             )
@@ -58,20 +54,16 @@ class ItemRepository(private val dao: ItemDao, private val purchaseHistoryDao: P
         )
     }
 
-    /** Full edit (name/quantity/unit/category/expiry) in one write, so partial updates can't clobber each other. */
+    /** Full edit (name/category/expiry) in one write, so partial updates can't clobber each other. */
     suspend fun updateItem(
         item: GroceryItem,
         name: String,
-        quantity: Int,
-        unit: String,
         category: String,
         expiryDate: LocalDate?
     ) {
         dao.update(
             item.copy(
                 name = name.trim(),
-                quantity = quantity,
-                unit = unit.trim(),
                 category = category,
                 expiryDate = expiryDate,
                 expiryNotified = false,

@@ -70,8 +70,6 @@ fun ListScreen(viewModel: ListViewModel, status: ItemStatus) {
                         onAdd = { suggestion ->
                             viewModel.addItem(
                                 name = suggestion.name,
-                                quantity = 1,
-                                unit = "",
                                 category = suggestion.category
                             )
                         },
@@ -117,8 +115,8 @@ fun ListScreen(viewModel: ListViewModel, status: ItemStatus) {
     if (showAddDialog) {
         AddItemDialog(
             onDismiss = { showAddDialog = false },
-            onConfirm = { name, quantity, unit, category ->
-                viewModel.addItem(name, quantity, unit, category)
+            onConfirm = { name, category ->
+                viewModel.addItem(name, category)
                 showAddDialog = false
             }
         )
@@ -128,8 +126,8 @@ fun ListScreen(viewModel: ListViewModel, status: ItemStatus) {
         EditItemDialog(
             item = editingItem,
             onDismiss = { itemEditing = null },
-            onConfirm = { name, quantity, unit, category, expiryDate ->
-                viewModel.updateItem(editingItem, name, quantity, unit, category, expiryDate)
+            onConfirm = { name, category, expiryDate ->
+                viewModel.updateItem(editingItem, name, category, expiryDate)
                 itemEditing = null
             },
             onDelete = { viewModel.deleteItem(editingItem) }

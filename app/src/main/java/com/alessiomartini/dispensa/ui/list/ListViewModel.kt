@@ -56,10 +56,10 @@ class ListViewModel(
         settingsRepository.dismissSuggestion(name)
     }
 
-    fun addItem(name: String, quantity: Int, unit: String, category: String) {
+    fun addItem(name: String, category: String) {
         if (name.isBlank()) return
         viewModelScope.launch {
-            repository.addToShoppingList(name, quantity.coerceAtLeast(1), unit, category)
+            repository.addToShoppingList(name, category)
         }
     }
 
@@ -93,12 +93,10 @@ class ListViewModel(
     fun updateItem(
         item: GroceryItem,
         name: String,
-        quantity: Int,
-        unit: String,
         category: String,
         expiryDate: LocalDate?
     ) {
-        viewModelScope.launch { repository.updateItem(item, name, quantity, unit, category, expiryDate) }
+        viewModelScope.launch { repository.updateItem(item, name, category, expiryDate) }
     }
 
     fun deleteItem(item: GroceryItem) {

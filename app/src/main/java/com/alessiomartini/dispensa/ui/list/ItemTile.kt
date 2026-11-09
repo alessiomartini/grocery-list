@@ -64,13 +64,6 @@ fun ItemTile(
                 modifier = Modifier.padding(top = 4.dp)
             )
 
-            val quantityLabel = if (item.unit.isNotBlank()) {
-                "${item.quantity} ${item.unit}"
-            } else {
-                "${item.quantity}"
-            }
-            Text(quantityLabel, style = MaterialTheme.typography.labelSmall)
-
             if (item.status == ItemStatus.IN_PANTRY) {
                 item.expiryDate?.let { expiryDate ->
                     val status = expiryStatusOf(expiryDate)
