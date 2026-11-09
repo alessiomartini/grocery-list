@@ -12,11 +12,15 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.alessiomartini.dispensa.R
 import com.alessiomartini.dispensa.data.FoodCatalog
+import com.alessiomartini.dispensa.data.FoodInfo
 import com.alessiomartini.dispensa.data.GroceryItem
 import com.alessiomartini.dispensa.data.ItemStatus
 import com.alessiomartini.dispensa.ui.expiry.colorForUrgency
@@ -30,6 +34,7 @@ private val tileDateFormatter = DateTimeFormatter.ofPattern("dd/MM")
 @Composable
 fun ItemTile(
     item: GroceryItem,
+    langs: List<String>,
     onTap: () -> Unit,
     onLongPress: () -> Unit
 ) {
@@ -56,7 +61,7 @@ fun ItemTile(
             Text(FoodCatalog.iconFor(item.name, item.category), fontSize = 28.sp)
 
             Text(
-                text = item.name,
+                text = FoodInfo.displayName(item.name, langs),
                 style = MaterialTheme.typography.labelMedium,
                 textAlign = TextAlign.Center,
                 maxLines = 2,
@@ -64,12 +69,14 @@ fun ItemTile(
                 modifier = Modifier.padding(top = 4.dp)
             )
 
-            val quantityLabel = if (item.unit.isNotBlank()) {
-                "${item.quantity} ${item.unit}"
-            } else {
-                "${item.quantity}"
+            // Dutch seasonality; only for fruit/veg with a table entry (see FoodInfo).
+            FoodInfo.inSeason(item.name)?.let { inSeason ->
+                Text(
+                    text = stringResource(if (inSeason) R.string.season_in else R.string.season_out),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = if (inSeason) Color(0xFF2E7D32) else Color(0xFF8D6E63)
+                )
             }
-            Text(quantityLabel, style = MaterialTheme.typography.labelSmall)
 
             if (item.status == ItemStatus.IN_PANTRY) {
                 item.expiryDate?.let { expiryDate ->

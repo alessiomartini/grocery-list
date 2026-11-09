@@ -37,6 +37,14 @@ here with a bit more detail so they don't get lost.
 None of these are started; there's no partial branch or scaffolding for them.
 
 ## Da fare
+- [x] Tolta la quantità per prodotto (2026-11-09; colonne `quantity`/`unit` restano in Room e nel sync, nessuna migrazione)
+- [x] Tag stagionalità per frutta/verdura (tabella mensile Paesi Bassi in `FoodInfo.kt`)
+- [x] Nomi in due lingue (it + nl di default, configurabili in Impostazioni) per i prodotti del catalogo
+- [x] Modifica della lista dal computer: `tools/pantry.py` (list/add/remove) sul D1 condiviso; l'app sincronizza da sola
+- [ ] Stagionalità: dove vivi → coltivato vicino o lontano (rimandato: serve un paese in Impostazioni e una tabella di origine per prodotto)
+- [ ] Nome del prodotto in due lingue per prodotti fuori catalogo (serve una colonna nuova in Room + D1 + sync; oggi solo catalogo)
+- [ ] Verificare la tabella stagionale con il calendario Milieu Centraal aggiornato (PDF del 2010 incompleto, tabella arrotondata a mesi)
+- [ ] Icone: oggi sono emoji nel catalogo (nessun set di icone nel repo); icona del launcher da ridisegnare solo se Alessio ne indica una
 - [ ] Categorie e catalogo dal server invece che nel codice: oggi `Categories.SUGGESTED` e `FoodCatalog` (categoria, icona, durata, alias di ogni alimento) sono scritti nell'APK, quindi una categoria nuova o un alimento spostato richiede un aggiornamento dell'app. Le modifiche ai prodotti nel D1 arrivano già col sync; l'obiettivo è che basti un sync anche per categorie e catalogo (es. tabelle `categories`/`catalog` nel D1 scaricate dal Worker, con il catalogo nell'APK come fallback offline)
 
 ## Da verificare
@@ -125,6 +133,7 @@ in a shared database. **This does not fit Pantry and is not planned:**
   as a plan to build one soon.
 
 ## Log
+- 2026-11-09: da task Google: tolta la quantità, tag stagionalità NL, nomi it/nl, `tools/pantry.py` per la lista dal computer (icone e "dove vivi" rimandati)
 - 2026-10-19: todo: categorie e catalogo sincronizzati dal server; nuova categoria "Herbs and spices" (sale, pepe, curry, prezzemolo, menta e spezie secche nel catalogo); corrette a mano le categorie di 4 prodotti nel D1; sync app↔backend (Room v3 con uuid/updatedAt/soft delete), retry e fallback dei modelli Gemini su 429/503, ricategorizzazione automatica dei prodotti in "Other", fix della CI (pacchetto `tools` di setup-android); risolto il crash da downgrade del database e allineato `main` al branch; prima sync riuscita (91 prodotti sul server) e catalogo esteso perché li riconosca tutti
 - 2026-10-18: FUTURE-ARCHITECTURE.md unito in ROADMAP.md (protocollo unico)
 - 2026-10-15: creata la roadmap per Projects Overview

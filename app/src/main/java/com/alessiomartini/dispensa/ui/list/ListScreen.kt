@@ -55,6 +55,7 @@ private fun groupByCategory(items: List<GroceryItem>): List<Pair<String, List<Gr
 @Composable
 fun ListScreen(viewModel: ListViewModel, status: ItemStatus) {
     val items by viewModel.items.collectAsState()
+    val langs by viewModel.nameLanguages.collectAsState()
     val suggestedItems by viewModel.suggestions.collectAsState()
     var showAddDialog by remember { mutableStateOf(false) }
     var itemEditing by remember { mutableStateOf<GroceryItem?>(null) }
@@ -70,8 +71,6 @@ fun ListScreen(viewModel: ListViewModel, status: ItemStatus) {
                         onAdd = { suggestion ->
                             viewModel.addItem(
                                 name = suggestion.name,
-                                quantity = 1,
-                                unit = "",
                                 category = suggestion.category
                             )
                         },
@@ -96,6 +95,7 @@ fun ListScreen(viewModel: ListViewModel, status: ItemStatus) {
                         CategoryGroup(
                             category = category,
                             items = categoryItems,
+                            langs = langs,
                             onTap = { tappedItem -> viewModel.toggleStatus(tappedItem, status) },
                             onLongPress = { itemEditing = it }
                         )
@@ -117,8 +117,8 @@ fun ListScreen(viewModel: ListViewModel, status: ItemStatus) {
     if (showAddDialog) {
         AddItemDialog(
             onDismiss = { showAddDialog = false },
-            onConfirm = { name, quantity, unit, category ->
-                viewModel.addItem(name, quantity, unit, category)
+            onConfirm = { name, category ->
+                viewModel.addItem(name, category)
                 showAddDialog = false
             }
         )
@@ -128,8 +128,8 @@ fun ListScreen(viewModel: ListViewModel, status: ItemStatus) {
         EditItemDialog(
             item = editingItem,
             onDismiss = { itemEditing = null },
-            onConfirm = { name, quantity, unit, category, expiryDate ->
-                viewModel.updateItem(editingItem, name, quantity, unit, category, expiryDate)
+            onConfirm = { name, category, expiryDate ->
+                viewModel.updateItem(editingItem, name, category, expiryDate)
                 itemEditing = null
             },
             onDelete = { viewModel.deleteItem(editingItem) }
@@ -142,6 +142,7 @@ fun ListScreen(viewModel: ListViewModel, status: ItemStatus) {
 private fun CategoryGroup(
     category: String,
     items: List<GroceryItem>,
+    langs: List<String>,
     onTap: (GroceryItem) -> Unit,
     onLongPress: (GroceryItem) -> Unit
 ) {
@@ -159,6 +160,7 @@ private fun CategoryGroup(
             items.forEach { groceryItem ->
                 ItemTile(
                     item = groceryItem,
+                    langs = langs,
                     onTap = { onTap(groceryItem) },
                     onLongPress = { onLongPress(groceryItem) }
                 )

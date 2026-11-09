@@ -120,6 +120,21 @@ fun SettingsScreen(
 
             HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
 
+            var languagesText by remember { mutableStateOf(settings.nameLanguages.joinToString(", ")) }
+            OutlinedTextField(
+                value = languagesText,
+                onValueChange = {
+                    languagesText = it
+                    viewModel.setNameLanguages(it)
+                },
+                label = { Text(stringResource(R.string.settings_name_languages)) },
+                supportingText = { Text(stringResource(R.string.settings_name_languages_hint)) },
+                singleLine = true,
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+
             UpdateSection(
                 state = updateState,
                 viewModel = updateViewModel,
