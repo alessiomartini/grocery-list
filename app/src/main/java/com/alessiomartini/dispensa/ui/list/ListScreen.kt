@@ -55,6 +55,7 @@ private fun groupByCategory(items: List<GroceryItem>): List<Pair<String, List<Gr
 @Composable
 fun ListScreen(viewModel: ListViewModel, status: ItemStatus) {
     val items by viewModel.items.collectAsState()
+    val langs by viewModel.nameLanguages.collectAsState()
     val suggestedItems by viewModel.suggestions.collectAsState()
     var showAddDialog by remember { mutableStateOf(false) }
     var itemEditing by remember { mutableStateOf<GroceryItem?>(null) }
@@ -94,6 +95,7 @@ fun ListScreen(viewModel: ListViewModel, status: ItemStatus) {
                         CategoryGroup(
                             category = category,
                             items = categoryItems,
+                            langs = langs,
                             onTap = { tappedItem -> viewModel.toggleStatus(tappedItem, status) },
                             onLongPress = { itemEditing = it }
                         )
@@ -140,6 +142,7 @@ fun ListScreen(viewModel: ListViewModel, status: ItemStatus) {
 private fun CategoryGroup(
     category: String,
     items: List<GroceryItem>,
+    langs: List<String>,
     onTap: (GroceryItem) -> Unit,
     onLongPress: (GroceryItem) -> Unit
 ) {
@@ -157,6 +160,7 @@ private fun CategoryGroup(
             items.forEach { groceryItem ->
                 ItemTile(
                     item = groceryItem,
+                    langs = langs,
                     onTap = { onTap(groceryItem) },
                     onLongPress = { onLongPress(groceryItem) }
                 )

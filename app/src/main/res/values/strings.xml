@@ -15,6 +15,10 @@
 
     <string name="add_item">Add item</string>
     <string name="edit_item">Edit item</string>
+    <string name="season_in">In season (NL)</string>
+    <string name="season_out">Out of season (NL)</string>
+    <string name="settings_name_languages">Name languages</string>
+    <string name="settings_name_languages_hint">Codes en, it, nl, in order (default: it, nl). Shows e.g. Latte / Melk for known products.</string>
     <string name="item_name">Name</string>
     <string name="item_category">Category</string>
     <string name="item_expiry_date">Expiry date (optional)</string>

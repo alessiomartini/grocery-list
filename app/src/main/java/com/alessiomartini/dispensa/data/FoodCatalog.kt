@@ -10,7 +10,9 @@ data class FoodCatalogItem(
     val shelfLifeDays: Int? = null,
     val extraKeywords: List<String> = emptyList()
 ) {
-    val keywords: List<String> = (extraKeywords + name).map { it.lowercase() }.distinct()
+    /** Short Italian/Dutch names would match inside unrelated words, so only 4+ letter ones join the substring match. */
+    val keywords: List<String> =
+        (extraKeywords + name + FoodInfo.translationsOf(name).filter { it.length >= 4 }).map { it.lowercase() }.distinct()
 }
 
 /**

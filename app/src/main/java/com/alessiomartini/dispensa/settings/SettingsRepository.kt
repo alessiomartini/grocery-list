@@ -28,7 +28,9 @@ data class AppSettings(
     /** Same as [itemsSyncedThrough], for the purchase history. */
     val purchasesSyncedThrough: Long = 0,
     /** Epoch millis of the last sync attempt, successful or not. */
-    val lastSyncAt: Long? = null
+    val lastSyncAt: Long? = null,
+    /** Languages ("en", "it", "nl") in which catalog item names are shown, in order. */
+    val nameLanguages: List<String> = listOf("it", "nl")
 ) {
     val syncConfigured: Boolean get() = syncUrl.isNotBlank() && syncToken.isNotBlank()
 
@@ -74,7 +76,8 @@ class SettingsRepository(context: Context) {
             syncToken = prefs.getString(KEY_SYNC_TOKEN, "") ?: "",
             itemsSyncedThrough = prefs.getLong(KEY_ITEMS_SYNCED_THROUGH, 0L),
             purchasesSyncedThrough = prefs.getLong(KEY_PURCHASES_SYNCED_THROUGH, 0L),
-            lastSyncAt = prefs.getLong(KEY_LAST_SYNC_AT, -1L).takeIf { it >= 0 }
+            lastSyncAt = prefs.getLong(KEY_LAST_SYNC_AT, -1L).takeIf { it >= 0 },
+            nameLanguages = (prefs.getString(KEY_NAME_LANGUAGES, null) ?: "it,nl").split(',').filter { it.isNotBlank() }
         )
     }
 
@@ -133,12 +136,19 @@ class SettingsRepository(context: Context) {
         _settings.value = _settings.value.copy(purchasesSyncedThrough = timestamp)
     }
 
+    fun setNameLanguages(text: String) {
+        val langs = text.lowercase().split(',', ' ').map { it.trim() }.filter { it in setOf("en", "it", "nl") }
+        prefs.edit().putString(KEY_NAME_LANGUAGES, langs.joinToString(",")).apply()
+        _settings.value = _settings.value.copy(nameLanguages = langs)
+    }
+
     fun setLastSyncAt(timestamp: Long) {
         prefs.edit().putLong(KEY_LAST_SYNC_AT, timestamp).apply()
         _settings.value = _settings.value.copy(lastSyncAt = timestamp)
     }
 
     companion object {
+        private const val KEY_NAME_LANGUAGES = "name_languages"
         private const val KEY_SYNC_URL = "sync_url"
         private const val KEY_SYNC_TOKEN = "sync_token"
         private const val KEY_ITEMS_SYNCED_THROUGH = "items_synced_through"

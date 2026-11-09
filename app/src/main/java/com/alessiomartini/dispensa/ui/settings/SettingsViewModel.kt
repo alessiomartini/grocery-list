@@ -17,6 +17,10 @@ class SettingsViewModel(private val repository: SettingsRepository) : ViewModel(
         repository.setAutoCheckForUpdates(enabled)
     }
 
+    fun setNameLanguages(text: String) {
+        repository.setNameLanguages(text)
+    }
+
     fun saveSync(url: String, token: String) {
         repository.saveSync(url, token)
     }

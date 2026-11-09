@@ -35,6 +35,10 @@ class ListViewModel(
     val items: StateFlow<List<GroceryItem>> = repository.observeAll()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
+    val nameLanguages: StateFlow<List<String>> = settingsRepository.settings
+        .map { it.nameLanguages }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), listOf("it", "nl"))
+
     val dismissedSuggestions: StateFlow<Set<String>> = settingsRepository.settings
         .map { it.dismissedSuggestions }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptySet())
