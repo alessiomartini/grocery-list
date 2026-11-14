@@ -207,6 +207,8 @@ object FoodCatalog {
     fun find(itemName: String): FoodCatalogItem? {
         val normalized = itemName.trim().lowercase()
         if (normalized.isEmpty()) return null
+        // Whole-name match first (plural, accents, spacing tolerant), then the keyword-in-text search.
+        FoodInfo.exact(itemName)?.let { return it }
         return items
             .flatMap { item -> item.keywords.filter { normalized.contains(it) }.map { it to item } }
             .maxByOrNull { (keyword, _) -> keyword.length }
