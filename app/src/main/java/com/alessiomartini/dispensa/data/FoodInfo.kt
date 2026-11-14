@@ -99,18 +99,44 @@ object FoodInfo {
     fun translationsOf(englishName: String): List<String> =
         translations[englishName.lowercase()]?.toList().orEmpty()
 
-    /** Catalog item whose English/Italian/Dutch name or alias is exactly [name] (not a substring match). */
-    private fun exact(name: String): FoodCatalogItem? {
-        val n = name.trim().lowercase()
-        return FoodCatalog.items.firstOrNull { item ->
-            n in item.keywords || translationsOf(item.name).any { it.lowercase() == n }
-        }
+    /**
+     * Key for comparing a typed name with the catalogue: lowercase, accents and punctuation removed,
+     * whitespace collapsed, and a plural/gender ending dropped from words of 4+ letters (it:
+     * pomodori/pomodoro, mele/mela; nl: appels/appel; en: eggs/egg). Only ever used to compare whole
+     * names, never as a substring, so "mela" and "melk" don't collide.
+     */
+    fun matchKey(name: String): String {
+        val folded = java.text.Normalizer.normalize(name, java.text.Normalizer.Form.NFD)
+            .replace(Regex("\\p{Mn}+"), "")
+            .lowercase()
+            .replace(Regex("[^a-z0-9]+"), " ")
+            .trim()
+        return folded.split(' ').joinToString(" ") { stem(it) }
     }
 
-    /** "Latte / Melk" for a catalog item shown in [langs] ("en", "it", "nl"); anything else stays as typed. */
+    private fun stem(word: String): String = when {
+        word.length < 4 -> word
+        word.endsWith("en") && word.length > 4 -> word.dropLast(2)
+        word.last() in "aeios" -> word.dropLast(1)
+        else -> word
+    }
+
+    /** matchKey -> catalogue item, for every English/Italian/Dutch name and alias (any length). */
+    private val index: Map<String, FoodCatalogItem> by lazy {
+        val m = HashMap<String, FoodCatalogItem>()
+        for (item in FoodCatalog.items) {
+            for (n in item.extraKeywords + item.name + translationsOf(item.name)) m.putIfAbsent(matchKey(n), item)
+        }
+        m
+    }
+
+    /** Catalog item whose English/Italian/Dutch name or alias equals [name] ignoring case, accents, spacing and plural (not a substring match). */
+    fun exact(name: String): FoodCatalogItem? = index[matchKey(name)]
+
+    /** "Latte / Melk" for a catalog item shown in [langs] ("en", "it", "nl"); anything else is shown as typed, capitalised. */
     fun displayName(name: String, langs: List<String>): String {
-        val item = exact(name) ?: return name
-        val t = translations[item.name.lowercase()] ?: return name
+        val item = exact(name) ?: return capitalized(name)
+        val t = translations[item.name.lowercase()] ?: return capitalized(name)
         val shown = langs.mapNotNull {
             when (it) {
                 "en" -> item.name
@@ -119,8 +145,12 @@ object FoodInfo {
                 else -> null
             }
         }.distinct()
-        return if (shown.isEmpty()) name else shown.joinToString(" / ")
+        return if (shown.isEmpty()) capitalized(name) else shown.joinToString(" / ")
     }
+
+    /** Hand-typed names that aren't in the catalogue still get a capital first letter when shown. */
+    private fun capitalized(name: String): String =
+        name.trim().replaceFirstChar { it.uppercase() }
 
     /** true = in Dutch season this month, false = out of season, null = no season info. */
     fun inSeason(name: String, month: Int = LocalDate.now().monthValue): Boolean? {

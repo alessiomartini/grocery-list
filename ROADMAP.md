@@ -38,7 +38,7 @@ None of these are started; there's no partial branch or scaffolding for them.
 
 ## Da fare
 - [ ] Interruttore per attivare/disattivare il multilingue e opzione per avere tre lingue (da projects-overview, nota 2026-11-13)
-- [ ] Bug sync: alcuni alimenti non sono sincronizzati (nome inserito a mano, senza traduzione, senza maiuscola, senza icona): trovare la causa e sistemare (nota 2026-11-13)
+- [x] Bug sync: alcuni alimenti non sono sincronizzati (nome inserito a mano, senza traduzione, senza maiuscola, senza icona): trovare la causa e sistemare (nota 2026-11-13)
 - [ ] Raccogliere gli scontrini e darli a Claude per aggiungere al catalogo gli alimenti mancanti e farsi suggerire alimenti nuovi (nota 2026-11-13)
 - [ ] Icone fuorvianti (mozzarella con la groviera, pasta con un piatto di pasta): usare immagini che ricordino il prodotto sullo scaffale (nota 2026-11-13)
 - [x] Tolta la quantità per prodotto (2026-11-09; colonne `quantity`/`unit` restano in Room e nel sync, nessuna migrazione)
@@ -57,6 +57,11 @@ None of these are started; there's no partial branch or scaffolding for them.
 - [ ] I modelli Gemini di riserva (`gemini-2.5-flash`, `gemini-2.5-flash-lite`, `gemini-2.0-flash`) esistono ancora per la chiave in uso: uno ritirato viene saltato (404), ma se lo fossero tutti le ricette fallirebbero
 
 ## Decisioni e cose provate
+
+### Bug "alimenti non sincronizzati" (2026-11-14)
+- Causa: il sync non c'entra. `SyncItemDto` e `worker.js` trasportano `name` identico, senza id di catalogo né traduzioni: traduzione, maiuscola e icona sono calcolate in locale dal nome (`FoodInfo.displayName`, `FoodCatalog.iconFor`). Il collegamento con il catalogo falliva per i nomi scritti a mano: `FoodInfo.exact` confrontava solo l'uguaglianza esatta con minuscole (niente plurali "pomodori"/"mele", accenti "caffe", spazi doppi) e `displayName` restituiva il nome grezzo, quindi senza maiuscola né traduzione; `FoodCatalog.find` usava solo "la parola chiave è contenuta nel testo", che non prende i plurali italiani. Colpiva soprattutto i nomi arrivati da altri canali (`tools/pantry.py`, altro dispositivo).
+- Fix: `FoodInfo.matchKey` (minuscole, senza accenti/punteggiatura, spazi compressi, desinenza di plurale/genere tolta su parole da 4+ lettere) e indice su nomi/alias/traduzioni; `FoodCatalog.find` prova prima questo confronto a nome intero; i nomi fuori catalogo si mostrano con la maiuscola. Nessuna modifica a schema Room, sync o backend. Test aggiunti in `FoodInfoTest`.
+- Non verificato in locale (niente Gradle qui): controllare la CI e provare sul telefono con "pomodori", "mele", "caffe".
 
 This file collects ideas that are not implemented yet, things left half-done, and
 explicit "not doing this" decisions with their reasoning — so a future session
@@ -137,6 +142,7 @@ in a shared database. **This does not fit Pantry and is not planned:**
   as a plan to build one soon.
 
 ## Log
+- 2026-11-14: 🤖 bug alimenti "non sincronizzati": causa nel confronto troppo rigido col catalogo (plurali, accenti, spazi), non nel sync; corretto con `FoodInfo.matchKey` e test (da verificare in CI)
 - 2026-11-14: note dal sito portate nel ROADMAP
 - 2026-11-09: da task Google: tolta la quantità, tag stagionalità NL, nomi it/nl, `tools/pantry.py` per la lista dal computer (icone e "dove vivi" rimandati)
 - 2026-10-19: todo: categorie e catalogo sincronizzati dal server; nuova categoria "Herbs and spices" (sale, pepe, curry, prezzemolo, menta e spezie secche nel catalogo); corrette a mano le categorie di 4 prodotti nel D1; sync app↔backend (Room v3 con uuid/updatedAt/soft delete), retry e fallback dei modelli Gemini su 429/503, ricategorizzazione automatica dei prodotti in "Other", fix della CI (pacchetto `tools` di setup-android); risolto il crash da downgrade del database e allineato `main` al branch; prima sync riuscita (91 prodotti sul server) e catalogo esteso perché li riconosca tutti
