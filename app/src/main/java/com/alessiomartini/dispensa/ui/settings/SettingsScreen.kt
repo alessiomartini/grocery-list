@@ -121,6 +121,43 @@ fun SettingsScreen(
             HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
 
             var languagesText by remember { mutableStateOf(settings.nameLanguages.joinToString(", ")) }
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(stringResource(R.string.settings_multilingual), style = MaterialTheme.typography.titleMedium)
+                    Text(
+                        stringResource(R.string.settings_multilingual_hint),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+                Switch(checked = settings.multilingualNames, onCheckedChange = viewModel::setMultilingualNames)
+            }
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(stringResource(R.string.settings_third_language), style = MaterialTheme.typography.titleMedium)
+                    Text(
+                        stringResource(R.string.settings_third_language_hint),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+                Switch(
+                    checked = settings.nameLanguages.size >= 3,
+                    enabled = settings.multilingualNames,
+                    onCheckedChange = {
+                        viewModel.setThirdLanguage(it)
+                        languagesText = viewModel.settings.value.nameLanguages.joinToString(", ")
+                    }
+                )
+            }
             OutlinedTextField(
                 value = languagesText,
                 onValueChange = {
