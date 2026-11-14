@@ -21,6 +21,14 @@ class SettingsViewModel(private val repository: SettingsRepository) : ViewModel(
         repository.setNameLanguages(text)
     }
 
+    fun setMultilingualNames(enabled: Boolean) {
+        repository.setMultilingualNames(enabled)
+    }
+
+    fun setThirdLanguage(enabled: Boolean) {
+        repository.setThirdLanguage(enabled)
+    }
+
     fun saveSync(url: String, token: String) {
         repository.saveSync(url, token)
     }

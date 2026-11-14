@@ -30,8 +30,13 @@ data class AppSettings(
     /** Epoch millis of the last sync attempt, successful or not. */
     val lastSyncAt: Long? = null,
     /** Languages ("en", "it", "nl") in which catalog item names are shown, in order. */
-    val nameLanguages: List<String> = listOf("it", "nl")
+    val nameLanguages: List<String> = listOf("it", "nl"),
+    /** Master switch: off = catalog names are shown only in the first of [nameLanguages]. */
+    val multilingualNames: Boolean = true
 ) {
+    /** The languages actually used to display names, after applying [multilingualNames]. */
+    val shownNameLanguages: List<String> get() = if (multilingualNames) nameLanguages else nameLanguages.take(1)
+
     val syncConfigured: Boolean get() = syncUrl.isNotBlank() && syncToken.isNotBlank()
 
     companion object {
@@ -77,7 +82,8 @@ class SettingsRepository(context: Context) {
             itemsSyncedThrough = prefs.getLong(KEY_ITEMS_SYNCED_THROUGH, 0L),
             purchasesSyncedThrough = prefs.getLong(KEY_PURCHASES_SYNCED_THROUGH, 0L),
             lastSyncAt = prefs.getLong(KEY_LAST_SYNC_AT, -1L).takeIf { it >= 0 },
-            nameLanguages = (prefs.getString(KEY_NAME_LANGUAGES, null) ?: "it,nl").split(',').filter { it.isNotBlank() }
+            nameLanguages = (prefs.getString(KEY_NAME_LANGUAGES, null) ?: "it,nl").split(',').filter { it.isNotBlank() },
+            multilingualNames = prefs.getBoolean(KEY_MULTILINGUAL_NAMES, true)
         )
     }
 
@@ -142,12 +148,26 @@ class SettingsRepository(context: Context) {
         _settings.value = _settings.value.copy(nameLanguages = langs)
     }
 
+    fun setMultilingualNames(enabled: Boolean) {
+        prefs.edit().putBoolean(KEY_MULTILINGUAL_NAMES, enabled).apply()
+        _settings.value = _settings.value.copy(multilingualNames = enabled)
+    }
+
+    /** On: show all three catalog languages (missing ones appended); off: keep only the first two. */
+    fun setThirdLanguage(enabled: Boolean) {
+        val current = _settings.value.nameLanguages
+        val langs = if (enabled) current + listOf("en", "it", "nl").filter { it !in current } else current.take(2)
+        prefs.edit().putString(KEY_NAME_LANGUAGES, langs.joinToString(",")).apply()
+        _settings.value = _settings.value.copy(nameLanguages = langs)
+    }
+
     fun setLastSyncAt(timestamp: Long) {
         prefs.edit().putLong(KEY_LAST_SYNC_AT, timestamp).apply()
         _settings.value = _settings.value.copy(lastSyncAt = timestamp)
     }
 
     companion object {
+        private const val KEY_MULTILINGUAL_NAMES = "multilingual_names"
         private const val KEY_NAME_LANGUAGES = "name_languages"
         private const val KEY_SYNC_URL = "sync_url"
         private const val KEY_SYNC_TOKEN = "sync_token"

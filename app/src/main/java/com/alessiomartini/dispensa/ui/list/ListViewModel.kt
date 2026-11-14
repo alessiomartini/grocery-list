@@ -36,7 +36,7 @@ class ListViewModel(
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
     val nameLanguages: StateFlow<List<String>> = settingsRepository.settings
-        .map { it.nameLanguages }
+        .map { it.shownNameLanguages }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), listOf("it", "nl"))
 
     val dismissedSuggestions: StateFlow<Set<String>> = settingsRepository.settings

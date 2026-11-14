@@ -17,6 +17,10 @@
     <string name="edit_item">Edit item</string>
     <string name="season_in">In season (NL)</string>
     <string name="season_out">Out of season (NL)</string>
+    <string name="settings_multilingual">Multilingual names</string>
+    <string name="settings_multilingual_hint">Off: show only the first language below.</string>
+    <string name="settings_third_language">Third language</string>
+    <string name="settings_third_language_hint">Also show the third catalog language (en, it, nl), e.g. Latte / Melk / Milk.</string>
     <string name="settings_name_languages">Name languages</string>
     <string name="settings_name_languages_hint">Codes en, it, nl, in order (default: it, nl). Shows e.g. Latte / Melk for known products.</string>
     <string name="item_name">Name</string>
