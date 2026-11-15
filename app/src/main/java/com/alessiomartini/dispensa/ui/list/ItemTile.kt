@@ -2,7 +2,13 @@ package com.alessiomartini.dispensa.ui.list
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Card
@@ -52,6 +58,7 @@ fun ItemTile(
             .width(96.dp)
             .combinedClickable(onClick = onTap, onLongClick = onLongPress)
     ) {
+        Box {
         Column(
             modifier = Modifier
                 .padding(8.dp)
@@ -69,15 +76,6 @@ fun ItemTile(
                 modifier = Modifier.padding(top = 4.dp)
             )
 
-            // Dutch seasonality; only for fruit/veg with a table entry (see FoodInfo).
-            FoodInfo.inSeason(item.name)?.let { inSeason ->
-                Text(
-                    text = stringResource(if (inSeason) R.string.season_in else R.string.season_out),
-                    style = MaterialTheme.typography.labelSmall,
-                    color = if (inSeason) Color(0xFF2E7D32) else Color(0xFF8D6E63)
-                )
-            }
-
             if (item.status == ItemStatus.IN_PANTRY) {
                 item.expiryDate?.let { expiryDate ->
                     val status = expiryStatusOf(expiryDate)
@@ -88,6 +86,20 @@ fun ItemTile(
                     )
                 }
             }
+        }
+
+        // Dutch seasonality badge (top-right); only for fruit/veg with a table entry (see FoodInfo).
+        FoodInfo.inSeason(item.name)?.let { inSeason ->
+            val label = stringResource(if (inSeason) R.string.season_in else R.string.season_out)
+            Box(
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(6.dp)
+                    .size(10.dp)
+                    .background(if (inSeason) Color(0xFF2E7D32) else Color(0xFF8D6E63), CircleShape)
+                    .semantics { contentDescription = label }
+            )
+        }
         }
     }
 }
