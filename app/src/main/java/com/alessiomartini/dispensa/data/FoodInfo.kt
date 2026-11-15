@@ -38,6 +38,7 @@ object FoodInfo {
         "flaxseed" to ("Semi di lino" to "Lijnzaad"), "hot sauce" to ("Salsa piccante" to "Hete saus"),
         "yeast" to ("Lievito" to "Gist"), "popcorn" to ("Popcorn" to "Popcorn"), "nesquik" to ("Nesquik" to "Nesquik"),
         "peas" to ("Piselli" to "Erwten"), "pancake mix" to ("Preparato per pancake" to "Pannenkoekenmix"),
+        "pine nuts" to ("Pinoli" to "Pijnboompitten"),
         "basil" to ("Basilico" to "Basilicum"), "thyme" to ("Timo" to "Tijm"), "coriander" to ("Coriandolo" to "Koriander"),
         "turmeric" to ("Curcuma" to "Kurkuma"), "star anise" to ("Anice stellato" to "Steranijs"),
         "cayenne" to ("Pepe di cayenna" to "Cayennepeper"), "garlic powder" to ("Aglio in polvere" to "Knoflookpoeder"),
