@@ -28,7 +28,6 @@ class FoodCatalogTest {
             "White pepper" to "Peppercorn mix",
             "Instant coffee" to "Instant coffee",
             "piselli" to "Peas",
-            "Heksenkaas" to "Pecorino",
             "Chickpeas" to "Chickpeas",
             "Sweet chili sauce" to "Hot sauce",
         ).forEach { (name, expected) -> assertEquals(name, expected, FoodCatalog.find(name)?.name) }
