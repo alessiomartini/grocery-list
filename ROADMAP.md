@@ -39,7 +39,7 @@ None of these are started; there's no partial branch or scaffolding for them.
 ## Da fare
 - [x] Interruttore per attivare/disattivare il multilingue e opzione per avere tre lingue (2026-11-14; solo preferenze, nessuna migrazione; il catalogo ha già en/it/nl, quindi nessun dato mancante)
 - [ ] Bug sync: alcuni alimenti non sono sincronizzati (nome inserito a mano, senza traduzione, senza maiuscola, senza icona): trovare la causa e sistemare (nota 2026-11-13)
-- [ ] (dati pronti 2026-11-15: 346 prodotti distinti, frequenze e intervalli in `E:\Alessio\Dati-personali\lidl\statistiche.md` e `items.csv`, da `life-log/lidl.py`; resta confrontarli con `FoodCatalog.kt` e importare lo storico come `purchase_history`) Raccogliere gli scontrini e darli a Claude per aggiungere al catalogo gli alimenti mancanti e farsi suggerire alimenti nuovi (nota 2026-11-13)
+- [x] (catalogo esteso 2026-11-15; import storico: script pronto, da applicare) (dati pronti 2026-11-15: 346 prodotti distinti, frequenze e intervalli in `E:\Alessio\Dati-personali\lidl\statistiche.md` e `items.csv`, da `life-log/lidl.py`; resta confrontarli con `FoodCatalog.kt` e importare lo storico come `purchase_history`) Raccogliere gli scontrini e darli a Claude per aggiungere al catalogo gli alimenti mancanti e farsi suggerire alimenti nuovi (nota 2026-11-13)
 - [ ] Icone fuorvianti (mozzarella con la groviera, pasta con un piatto di pasta): usare immagini che ricordino il prodotto sullo scaffale (nota 2026-11-13)
 - [x] Tolta la quantità per prodotto (2026-11-09; colonne `quantity`/`unit` restano in Room e nel sync, nessuna migrazione)
 - [x] Tag stagionalità per frutta/verdura (tabella mensile Paesi Bassi in `FoodInfo.kt`)
@@ -137,6 +137,7 @@ in a shared database. **This does not fit Pantry and is not planned:**
   as a plan to build one soon.
 
 ## Log
+- 2026-11-15: catalogo esteso con i nomi olandesi degli scontrini Lidl (PR #10, test `FoodCatalogTest`); `tools/import_lidl.py` importa lo storico (1.056 righe) in `purchase_history`, anteprima di default, `--apply` da lanciare da Alessio
 - 2026-11-14: 🤖 interruttore multilingue e opzione terza lingua nelle Impostazioni (solo preferenze); note dal sito portate nel ROADMAP
 - 2026-11-09: da task Google: tolta la quantità, tag stagionalità NL, nomi it/nl, `tools/pantry.py` per la lista dal computer (icone e "dove vivi" rimandati)
 - 2026-10-19: todo: categorie e catalogo sincronizzati dal server; nuova categoria "Herbs and spices" (sale, pepe, curry, prezzemolo, menta e spezie secche nel catalogo); corrette a mano le categorie di 4 prodotti nel D1; sync app↔backend (Room v3 con uuid/updatedAt/soft delete), retry e fallback dei modelli Gemini su 429/503, ricategorizzazione automatica dei prodotti in "Other", fix della CI (pacchetto `tools` di setup-android); risolto il crash da downgrade del database e allineato `main` al branch; prima sync riuscita (91 prodotti sul server) e catalogo esteso perché li riconosca tutti

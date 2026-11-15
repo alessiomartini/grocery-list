@@ -26,21 +26,21 @@ object FoodCatalog {
     val items: List<FoodCatalogItem> = listOf(
         // Fruits and vegetables
         FoodCatalogItem("Apple", "Fruits and vegetables", "🍎", 21),
-        FoodCatalogItem("Banana", "Fruits and vegetables", "🍌", 5),
-        FoodCatalogItem("Orange", "Fruits and vegetables", "🍊", 14),
+        FoodCatalogItem("Banana", "Fruits and vegetables", "🍌", 5, listOf("bananen")),
+        FoodCatalogItem("Orange", "Fruits and vegetables", "🍊", 14, listOf("mandarijn", "mandarin", "mandarijnen")),
         FoodCatalogItem("Lemon", "Fruits and vegetables", "🍋", 21),
         FoodCatalogItem("Grapes", "Fruits and vegetables", "🍇", 7),
         FoodCatalogItem("Strawberry", "Fruits and vegetables", "🍓", 4, listOf("strawberries")),
         FoodCatalogItem("Watermelon", "Fruits and vegetables", "🍉", 7),
         FoodCatalogItem("Pineapple", "Fruits and vegetables", "🍍", 5),
         FoodCatalogItem("Avocado", "Fruits and vegetables", "🥑", 5),
-        FoodCatalogItem("Tomato", "Fruits and vegetables", "🍅", 7, listOf("tomatoes")),
-        FoodCatalogItem("Potato", "Fruits and vegetables", "🥔", 30, listOf("potatoes")),
-        FoodCatalogItem("Carrot", "Fruits and vegetables", "🥕", 21, listOf("carrots")),
-        FoodCatalogItem("Onion", "Fruits and vegetables", "🧅", 30, listOf("onions")),
+        FoodCatalogItem("Tomato", "Fruits and vegetables", "🍅", 7, listOf("tomatoes", "tomaten", "trostomaten", "snacktomaten")),
+        FoodCatalogItem("Potato", "Fruits and vegetables", "🥔", 30, listOf("potatoes", "krieltjes")),
+        FoodCatalogItem("Carrot", "Fruits and vegetables", "🥕", 21, listOf("carrots", "waspeen", "winterpeen", "wortelen")),
+        FoodCatalogItem("Onion", "Fruits and vegetables", "🧅", 30, listOf("onions", "uien")),
         FoodCatalogItem("Garlic", "Fruits and vegetables", "🧄", 60),
         FoodCatalogItem("Broccoli", "Fruits and vegetables", "🥦", 5),
-        FoodCatalogItem("Lettuce", "Fruits and vegetables", "🥬", 5, listOf("salad greens", "salad", "insalata")),
+        FoodCatalogItem("Lettuce", "Fruits and vegetables", "🥬", 5, listOf("salad greens", "salad", "insalata", "ijsbergsla", "batavia", "salademix")),
         FoodCatalogItem("Cucumber", "Fruits and vegetables", "🥒", 7),
         FoodCatalogItem("Bell pepper", "Fruits and vegetables", "🫑", 10, listOf("peppers", "paprika")),
         FoodCatalogItem("Mushroom", "Fruits and vegetables", "🍄", 5, listOf("mushrooms")),
@@ -51,17 +51,24 @@ object FoodCatalog {
         FoodCatalogItem("Celery", "Fruits and vegetables", "🥬", 14, listOf("bleekselderij", "sedano")),
         FoodCatalogItem("Leeks", "Fruits and vegetables", "🥬", 10, listOf("leek", "porro", "porri", "prei")),
         FoodCatalogItem("Cauliflower", "Fruits and vegetables", "🥦", 7, listOf("cavolfiore", "bloemkool")),
+        // Added from Lidl receipts 2024-2026 (frequent buys the catalog did not recognise).
+        FoodCatalogItem("Endive", "Fruits and vegetables", "🥬", 5, listOf("andijvie")),
+        FoodCatalogItem("Fennel", "Fruits and vegetables", "🥬", 7, listOf("finocchio", "venkel")),
+        FoodCatalogItem("Berries", "Fruits and vegetables", "🫐", 4, listOf("bessen", "frambozen", "raspberries", "blueberries")),
+        FoodCatalogItem("Ginger", "Fruits and vegetables", "🫚", 21, listOf("zenzero", "gember")),
+        FoodCatalogItem("Vegetable pan", "Fruits and vegetables", "🥗", 5, listOf("groentepannetje", "stir fry mix")),
 
         // Dairy and eggs
         FoodCatalogItem("Milk", "Dairy and eggs", "🥛", 7),
         FoodCatalogItem("Eggs", "Dairy and eggs", "🥚", 21, listOf("egg")),
-        FoodCatalogItem("Cheese", "Dairy and eggs", "🧀", 30),
-        FoodCatalogItem("Butter", "Dairy and eggs", "🧈", 60),
+        FoodCatalogItem("Cheese", "Dairy and eggs", "🧀", 30, listOf("brie")),
+        FoodCatalogItem("Butter", "Dairy and eggs", "🧈", 60, listOf("roomboter", "zuivelspread")),
         FoodCatalogItem("Yogurt", "Dairy and eggs", "🥣", 14, listOf("yoghurt")),
         FoodCatalogItem("Cream", "Dairy and eggs", "🥛", 10),
         FoodCatalogItem("Feta", "Dairy and eggs", "🧀", 30),
         FoodCatalogItem("Mozzarella", "Dairy and eggs", "🧀", 14),
         FoodCatalogItem("Ricotta", "Dairy and eggs", "🧀", 10),
+        FoodCatalogItem("Soy drink", "Dairy and eggs", "🥛", 180, listOf("sojadrink", "soy milk", "latte di soia")),
 
         // Meat and fish
         FoodCatalogItem("Chicken", "Meat and fish", "🍗", 2),
@@ -82,7 +89,7 @@ object FoodCatalog {
         FoodCatalogItem("Bread", "Bread and cereals", "🍞", 5),
         FoodCatalogItem(
             "Pasta", "Bread and cereals", "🍝", 365,
-            listOf("penne", "farfalle", "fusilli", "spaghetti", "tagliatelle", "lasagne")
+            listOf("penne", "farfalle", "fusilli", "spaghetti", "tagliatelle", "lasagne", "macaroni", "orecchiette", "conchiglioni")
         ),
         FoodCatalogItem("Rice", "Bread and cereals", "🍚", 365, listOf("basmati")),
         FoodCatalogItem("Cereal", "Bread and cereals", "🥣", 180, listOf("cereals")),
@@ -91,13 +98,18 @@ object FoodCatalog {
         FoodCatalogItem("Bagel", "Bread and cereals", "🥯", 5, listOf("bagels")),
         FoodCatalogItem("Croissant", "Bread and cereals", "🥐", 3, listOf("croissants")),
         FoodCatalogItem("Stroopwafel", "Bread and cereals", "🧇", 90, listOf("stroop wafel", "waffle cookie")),
-        FoodCatalogItem("Biscuits", "Bread and cereals", "🍪", 180, listOf("kruidnoten", "speculaas")),
+        FoodCatalogItem("Biscuits", "Bread and cereals", "🍪", 180, listOf("kruidnoten", "speculaas", "cookies", "cantuccini")),
         FoodCatalogItem("Crackers", "Bread and cereals", "🍘", 180),
         FoodCatalogItem("Couscous", "Bread and cereals", "🌾", 365, listOf("cous cous")),
         FoodCatalogItem("Baguette", "Bread and cereals", "🥖", 2, listOf("stokbrood", "french bread")),
         // "chocolate muesli" spelled out: it's longer than "chocolate", so it wins the match.
         FoodCatalogItem("Muesli", "Bread and cereals", "🥣", 180, listOf("granola", "chocolate muesli")),
         FoodCatalogItem("Muffin", "Bread and cereals", "🧁", 5, listOf("muffins")),
+        FoodCatalogItem("Wraps", "Bread and cereals", "🌯", 21, listOf("tortilla", "piadina")),
+        FoodCatalogItem(
+            "Bakery snack", "Bread and cereals", "🥐", 3,
+            listOf("bake-off", "broodje", "gevulde koek", "borek", "donut", "kampioentje")
+        ),
         FoodCatalogItem("Puff pastry", "Bread and cereals", "🥐", 14, listOf("pasta sfoglia", "sfoglia", "bladerdeeg")),
 
         // Pantry staples
@@ -107,7 +119,7 @@ object FoodCatalog {
         FoodCatalogItem("Honey", "Pantry staples", "🍯", 1825),
         FoodCatalogItem(
             "Canned tomatoes", "Pantry staples", "🥫", 730,
-            listOf("passata", "polpa", "chopped tomatoes", "tomato sauce")
+            listOf("passata", "polpa", "chopped tomatoes", "tomato sauce", "tomaten gezeefd", "tomatensaus", "tomatenblokjes", "pastasaus")
         ),
         FoodCatalogItem("Beans", "Pantry staples", "🥫", 730),
         FoodCatalogItem("Jam", "Pantry staples", "🍓", 365, listOf("marmalade")),
@@ -119,7 +131,7 @@ object FoodCatalog {
         FoodCatalogItem("Broth dice", "Pantry staples", "🍲", 730, listOf("stock cubes", "bouillon")),
         FoodCatalogItem("Chickpeas", "Pantry staples", "🫘", 730),
         FoodCatalogItem("Lentils", "Pantry staples", "🫘", 730),
-        FoodCatalogItem("Mixed nuts", "Pantry staples", "🥜", 180, listOf("nuts")),
+        FoodCatalogItem("Mixed nuts", "Pantry staples", "🥜", 180, listOf("nuts", "walnoten", "amandelen", "walnuts", "almonds")),
         FoodCatalogItem("Nutella", "Pantry staples", "🍫", 365, listOf("hazelnut spread")),
         // Canned/frozen corn kernels (e.g. Italian "mais") - kept separate from fresh corn-on-the-cob,
         // which has a much shorter shelf life.
@@ -127,17 +139,22 @@ object FoodCatalog {
         FoodCatalogItem("Olives", "Pantry staples", "🫒", 365, listOf("olive")),
         FoodCatalogItem("Tahini", "Pantry staples", "🥜", 180, listOf("tahina", "taina", "tahin")),
         FoodCatalogItem("Coconut milk", "Pantry staples", "🥥", 730, listOf("latte di cocco", "kokosmelk")),
+        FoodCatalogItem("Mayonnaise", "Pantry staples", "🥫", 180, listOf("mayonaise", "maionese")),
+        FoodCatalogItem("Baking mix", "Pantry staples", "🧁", 365, listOf("brownie", "cake mix", "mix voor")),
+        FoodCatalogItem("Multivitamin", "Pantry staples", "💊", 730, listOf("multivitamine", "ace multivitamine")),
+        FoodCatalogItem("Chips", "Pantry staples", "🍿", 120, listOf("crisps", "ribbelchips", "flatchips")),
         FoodCatalogItem("Mashed potatoes", "Pantry staples", "🥔", 14, listOf("mashed potato")),
 
         // Herbs and spices (fresh herbs keep their short shelf life)
         FoodCatalogItem("Parsley", "Herbs and spices", "🌿", 7, listOf("prezzemolo", "peterselie")),
+        FoodCatalogItem("Rosemary", "Herbs and spices", "🌿", 7, listOf("rozemarijn", "rosmarino")),
         FoodCatalogItem("Mint", "Herbs and spices", "🌿", 7, listOf("menta", "munt")),
         FoodCatalogItem("Salt", "Herbs and spices", "🧂", 1825),
         FoodCatalogItem("Pepper", "Herbs and spices", "🧂", 1825, listOf("black pepper")),
         FoodCatalogItem("Curry", "Herbs and spices", "🍛", 365, listOf("curry powder", "curry paste")),
         // Plain "paprika" stays the Dutch word for bell pepper; only the spelled-out spice lands here.
         FoodCatalogItem("Paprika powder", "Herbs and spices", "🌶️", 730, listOf("smoked paprika", "paprikapoeder")),
-        FoodCatalogItem("Oregano", "Herbs and spices", "🌿", 730, listOf("origano")),
+        FoodCatalogItem("Oregano", "Herbs and spices", "🌿", 730, listOf("origano", "italiaanse kruiden")),
         FoodCatalogItem("Cinnamon", "Herbs and spices", "🌰", 730, listOf("cannella", "kaneel")),
         FoodCatalogItem("Cumin", "Herbs and spices", "🌰", 730, listOf("cumino", "komijn")),
         FoodCatalogItem("Chili flakes", "Herbs and spices", "🌶️", 730, listOf("peperoncino", "chilli flakes")),
@@ -145,7 +162,7 @@ object FoodCatalog {
 
         // Frozen foods
         FoodCatalogItem("Ice cream", "Frozen foods", "🍦", 90),
-        FoodCatalogItem("Frozen pizza", "Frozen foods", "🍕", 180),
+        FoodCatalogItem("Frozen pizza", "Frozen foods", "🍕", 180, listOf("pizza")),
         FoodCatalogItem(
             "Frozen vegetables", "Frozen foods", "🧊", 270,
             listOf("vegetable mix", "stir fry vegetables")
@@ -156,11 +173,11 @@ object FoodCatalog {
         // Beverages
         FoodCatalogItem("Water", "Beverages", "💧", 365),
         FoodCatalogItem("Juice", "Beverages", "🧃", 14),
-        FoodCatalogItem("Coffee", "Beverages", "☕", 180),
+        FoodCatalogItem("Coffee", "Beverages", "☕", 180, listOf("koffiepads", "café", "coffee pads")),
         FoodCatalogItem("Tea", "Beverages", "🍵", 365),
         FoodCatalogItem("Wine", "Beverages", "🍷", 1825),
-        FoodCatalogItem("Beer", "Beverages", "🍺", 180),
-        FoodCatalogItem("Soda", "Beverages", "🥤", 180, listOf("soft drink", "pop", "cola", "coke")),
+        FoodCatalogItem("Beer", "Beverages", "🍺", 180, listOf("radler", "pils", "desperados")),
+        FoodCatalogItem("Soda", "Beverages", "🥤", 180, listOf("soft drink", "pop", "cola", "coke", "energy drink")),
 
         // Household and hygiene (non-perishable: no shelf life)
         FoodCatalogItem("Toilet paper", "Household and hygiene", "🧻"),
