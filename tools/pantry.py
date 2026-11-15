@@ -25,7 +25,7 @@ if not URL or not TOKEN:
 def call(path, body=None):
     req = urllib.request.Request(
         URL + path, data=None if body is None else json.dumps(body).encode(),
-        headers={"Authorization": "Bearer " + TOKEN, "Content-Type": "application/json"})
+        headers={"Authorization": "Bearer " + TOKEN, "Content-Type": "application/json", "User-Agent": "pantry-cli/1"})
     with urllib.request.urlopen(req) as r:
         return json.load(r)
 
