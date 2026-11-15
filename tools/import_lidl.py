@@ -33,6 +33,6 @@ if "--apply" in sys.argv:
     url, token = os.environ["PANTRY_URL"].rstrip("/"), os.environ["PANTRY_TOKEN"]
     for k in range(0, len(rows), 200):
         req = urllib.request.Request(url + "/api/purchases", data=json.dumps({"rows": rows[k:k + 200]}).encode(),
-                                     headers={"Authorization": "Bearer " + token, "Content-Type": "application/json"})
+                                     headers={"Authorization": "Bearer " + token, "Content-Type": "application/json", "User-Agent": "pantry-cli/1"})
         urllib.request.urlopen(req).read()
     print("scritto")
