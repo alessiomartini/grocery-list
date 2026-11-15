@@ -12,3 +12,4 @@ local.properties
 *.ap_
 *.dex
 tools/.env
+backend/.wrangler/
