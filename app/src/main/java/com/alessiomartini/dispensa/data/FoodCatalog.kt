@@ -138,6 +138,7 @@ object FoodCatalog {
         FoodCatalogItem("Chickpeas", "Pantry staples", "🫘", 730),
         FoodCatalogItem("Lentils", "Pantry staples", "🫘", 730),
         FoodCatalogItem("Mixed nuts", "Pantry staples", "🥜", 180, listOf("nuts", "walnoten", "amandelen", "walnuts", "almonds")),
+        FoodCatalogItem("Pine nuts", "Pantry staples", "🌰", 180, listOf("pinoli", "pijnboompitten")),
         FoodCatalogItem("Nutella", "Pantry staples", "🍫", 365, listOf("hazelnut spread")),
         // Canned/frozen corn kernels (e.g. Italian "mais") - kept separate from fresh corn-on-the-cob,
         // which has a much shorter shelf life.
