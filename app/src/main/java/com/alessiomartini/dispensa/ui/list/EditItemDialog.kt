@@ -35,6 +35,7 @@ fun EditItemDialog(
     item: GroceryItem,
     onDismiss: () -> Unit,
     onConfirm: (name: String, category: String, expiryDate: LocalDate?) -> Unit,
+    onArchive: () -> Unit,
     onDelete: () -> Unit
 ) {
     var name by remember { mutableStateOf(item.name) }
@@ -89,6 +90,15 @@ fun EditItemDialog(
                         ?: stringResource(R.string.item_expiry_none)
                     TextButton(onClick = { showDatePicker = true }) {
                         Text(stringResource(R.string.item_expiry_date_value, expiryLabel))
+                    }
+                }
+
+                if (item.status != ItemStatus.ARCHIVED) {
+                    TextButton(onClick = {
+                        onArchive()
+                        onDismiss()
+                    }) {
+                        Text(stringResource(R.string.archive))
                     }
                 }
 

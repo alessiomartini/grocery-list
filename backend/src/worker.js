@@ -12,7 +12,7 @@
 const MAX_ROWS_PER_REQUEST = 500;
 const MAX_NAME = 200;
 const MAX_SHORT_TEXT = 60;
-const STATUSES = new Set(["TO_BUY", "IN_PANTRY"]);
+const STATUSES = new Set(["TO_BUY", "IN_PANTRY", "ARCHIVED"]);
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 const json = (data, status = 200) =>

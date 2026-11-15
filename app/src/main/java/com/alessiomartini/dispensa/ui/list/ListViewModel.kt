@@ -103,6 +103,10 @@ class ListViewModel(
         viewModelScope.launch { repository.updateItem(item, name, category, expiryDate) }
     }
 
+    fun archiveItem(item: GroceryItem) {
+        viewModelScope.launch { repository.archive(item) }
+    }
+
     fun deleteItem(item: GroceryItem) {
         viewModelScope.launch { repository.delete(item) }
     }
