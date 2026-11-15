@@ -138,6 +138,7 @@ in a shared database. **This does not fit Pantry and is not planned:**
   as a plan to build one soon.
 
 ## Log
+- 2026-11-15: etichetta "in season / out of season" sostituita da un bollino colorato (verde / marrone) in alto a destra della scheda
 - 2026-11-15: nomi e categorie di 36 alimenti inseriti a mano sistemati nel database (nomi inglesi del catalogo, maiuscole, categorie sbagliate); lasciati come erano "Baking mix - biscottini rotondi" e il doppione "Ice cream"
 - 2026-11-15: controllo del catalogo sulla lista reale: +38 alimenti (spezie, salse, formaggi, ecc.), icone e traduzioni corrette; nelle Ricette una box per dare indicazioni a Gemini prima di premere Snack/Meal (non verificato in locale, solo CI)
 - 2026-11-15: archiviazione degli alimenti (stato `ARCHIVED`, nessuna migrazione Room; il Worker accetta il nuovo stato: serve il deploy del backend)
