@@ -39,7 +39,7 @@ None of these are started; there's no partial branch or scaffolding for them.
 ## Da fare
 - [x] Interruttore per attivare/disattivare il multilingue e opzione per avere tre lingue (2026-11-14; solo preferenze, nessuna migrazione; il catalogo ha già en/it/nl, quindi nessun dato mancante)
 - [ ] Bug sync: alcuni alimenti non sono sincronizzati (nome inserito a mano, senza traduzione, senza maiuscola, senza icona): trovare la causa e sistemare (nota 2026-11-13)
-- [ ] Raccogliere gli scontrini e darli a Claude per aggiungere al catalogo gli alimenti mancanti e farsi suggerire alimenti nuovi (nota 2026-11-13)
+- [ ] (dati pronti 2026-11-15: 346 prodotti distinti, frequenze e intervalli in `E:\Alessio\Dati-personali\lidl\statistiche.md` e `items.csv`, da `life-log/lidl.py`; resta confrontarli con `FoodCatalog.kt` e importare lo storico come `purchase_history`) Raccogliere gli scontrini e darli a Claude per aggiungere al catalogo gli alimenti mancanti e farsi suggerire alimenti nuovi (nota 2026-11-13)
 - [ ] Icone fuorvianti (mozzarella con la groviera, pasta con un piatto di pasta): usare immagini che ricordino il prodotto sullo scaffale (nota 2026-11-13)
 - [x] Tolta la quantità per prodotto (2026-11-09; colonne `quantity`/`unit` restano in Room e nel sync, nessuna migrazione)
 - [x] Tag stagionalità per frutta/verdura (tabella mensile Paesi Bassi in `FoodInfo.kt`)
