@@ -1,6 +1,7 @@
 package com.alessiomartini.dispensa.ui.list
 
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
@@ -61,6 +62,8 @@ fun ListScreen(viewModel: ListViewModel, status: ItemStatus) {
     var itemEditing by remember { mutableStateOf<GroceryItem?>(null) }
 
     val visibleItems = items.filter { it.status == status }
+    val archivedItems = items.filter { it.status == ItemStatus.ARCHIVED }
+    var showArchived by remember { mutableStateOf(false) }
 
     Box(modifier = Modifier.fillMaxSize()) {
         LazyColumn(modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp)) {
@@ -102,6 +105,36 @@ fun ListScreen(viewModel: ListViewModel, status: ItemStatus) {
                     }
                 }
             }
+
+            // Archive lives at the bottom of "To buy" only: tap an archived tile to bring it back to the list.
+            if (status == ItemStatus.TO_BUY && archivedItems.isNotEmpty()) {
+                item {
+                    Text(
+                        text = stringResource(
+                            if (showArchived) R.string.archive_hide else R.string.archive_show, archivedItems.size
+                        ),
+                        style = MaterialTheme.typography.titleSmall,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable { showArchived = !showArchived }
+                            .padding(top = 24.dp, bottom = 8.dp)
+                    )
+                }
+                if (showArchived) {
+                    groupByCategory(archivedItems).forEach { (category, categoryItems) ->
+                        item {
+                            CategoryGroup(
+                                category = category,
+                                items = categoryItems,
+                                langs = langs,
+                                onTap = { viewModel.markAsFinished(it) },
+                                onLongPress = { itemEditing = it }
+                            )
+                        }
+                    }
+                }
+                item { Box(modifier = Modifier.padding(bottom = 88.dp)) }
+            }
         }
 
         if (status == ItemStatus.TO_BUY) {
@@ -132,6 +165,7 @@ fun ListScreen(viewModel: ListViewModel, status: ItemStatus) {
                 viewModel.updateItem(editingItem, name, category, expiryDate)
                 itemEditing = null
             },
+            onArchive = { viewModel.archiveItem(editingItem) },
             onDelete = { viewModel.deleteItem(editingItem) }
         )
     }

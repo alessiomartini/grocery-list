@@ -54,6 +54,19 @@ class ItemRepository(private val dao: ItemDao, private val purchaseHistoryDao: P
         )
     }
 
+    /** Takes the item off the everyday lists without deleting it; [markAsFinished] brings it back to "to buy". */
+    suspend fun archive(item: GroceryItem) {
+        dao.update(
+            item.copy(
+                status = ItemStatus.ARCHIVED,
+                expiryDate = null,
+                statusChangedAt = Instant.now(),
+                expiryNotified = false,
+                updatedAt = Instant.now()
+            )
+        )
+    }
+
     /** Full edit (name/category/expiry) in one write, so partial updates can't clobber each other. */
     suspend fun updateItem(
         item: GroceryItem,

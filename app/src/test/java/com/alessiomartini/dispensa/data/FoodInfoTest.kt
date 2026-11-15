@@ -18,3 +18,11 @@ class FoodInfoTest {
         assertNull(FoodInfo.inSeason("Milk", 6))
     }
 }
+
+class ItemStatusTest {
+    /** Status is stored and synced by name: ARCHIVED must round-trip and be accepted by the Worker's STATUSES. */
+    @Test fun archivedRoundTrips() {
+        val c = Converters()
+        assertEquals(ItemStatus.ARCHIVED, c.fromStatusName(c.statusToName(ItemStatus.ARCHIVED)))
+    }
+}

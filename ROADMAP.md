@@ -137,6 +137,7 @@ in a shared database. **This does not fit Pantry and is not planned:**
   as a plan to build one soon.
 
 ## Log
+- 2026-11-15: archiviazione degli alimenti (stato `ARCHIVED`, nessuna migrazione Room; il Worker accetta il nuovo stato: serve il deploy del backend)
 - 2026-11-15: catalogo esteso con i nomi olandesi degli scontrini Lidl (PR #10, test `FoodCatalogTest`); `tools/import_lidl.py` importa lo storico (1.056 righe) in `purchase_history`, anteprima di default, `--apply` da lanciare da Alessio
 - 2026-11-14: 🤖 interruttore multilingue e opzione terza lingua nelle Impostazioni (solo preferenze); note dal sito portate nel ROADMAP
 - 2026-11-09: da task Google: tolta la quantità, tag stagionalità NL, nomi it/nl, `tools/pantry.py` per la lista dal computer (icone e "dove vivi" rimandati)
