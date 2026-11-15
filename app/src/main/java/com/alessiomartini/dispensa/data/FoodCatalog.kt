@@ -70,7 +70,7 @@ object FoodCatalog {
         FoodCatalogItem("Mozzarella", "Dairy and eggs", "🧀", 14),
         FoodCatalogItem("Ricotta", "Dairy and eggs", "🧀", 10),
         FoodCatalogItem("Cream cheese", "Dairy and eggs", "🧀", 21, listOf("philadelphia", "roomkaas", "spalmabile")),
-        FoodCatalogItem("Pecorino", "Dairy and eggs", "🧀", 60, listOf("parmesan", "parmigiano", "grana", "heksenkaas")),
+        FoodCatalogItem("Pecorino", "Dairy and eggs", "🧀", 60, listOf("parmesan", "parmigiano", "grana")),
         FoodCatalogItem("Soy drink", "Dairy and eggs", "🥛", 180, listOf("sojadrink", "soy milk", "latte di soia")),
 
         // Meat and fish
