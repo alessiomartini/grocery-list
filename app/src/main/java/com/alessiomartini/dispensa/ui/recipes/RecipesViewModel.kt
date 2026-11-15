@@ -31,7 +31,7 @@ class RecipesViewModel(
     private val _uiState = MutableStateFlow<RecipesUiState>(RecipesUiState.Idle)
     val uiState: StateFlow<RecipesUiState> = _uiState.asStateFlow()
 
-    fun suggestRecipes(type: RecipeType) {
+    fun suggestRecipes(type: RecipeType, notes: String = "") {
         viewModelScope.launch {
             _uiState.value = RecipesUiState.Loading
 
@@ -44,7 +44,7 @@ class RecipesViewModel(
                 return@launch
             }
 
-            _uiState.value = when (val result = recipeSuggestionRepository.suggestRecipes(pantryItemNames, type)) {
+            _uiState.value = when (val result = recipeSuggestionRepository.suggestRecipes(pantryItemNames, type, notes)) {
                 is RecipeResult.Success -> RecipesUiState.Success(result.recipes)
                 is RecipeResult.NoApiKey -> RecipesUiState.NoApiKey
                 is RecipeResult.Error -> RecipesUiState.Error(result.message)

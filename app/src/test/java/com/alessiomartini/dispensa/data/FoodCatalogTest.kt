@@ -19,4 +19,18 @@ class FoodCatalogTest {
             "Franse brie 60%" to "Cheese",
         ).forEach { (receipt, expected) -> assertEquals(receipt, expected, FoodCatalog.find(receipt)?.name) }
     }
+
+    @Test fun pantryNames() {
+        mapOf(
+            "Tomato paste" to "Tomato paste",
+            "Cream cheese" to "Cream cheese",
+            "Chili pepper" to "Chili pepper",
+            "White pepper" to "Peppercorn mix",
+            "Instant coffee" to "Instant coffee",
+            "piselli" to "Peas",
+            "Heksenkaas" to "Pecorino",
+            "Chickpeas" to "Chickpeas",
+            "Sweet chili sauce" to "Hot sauce",
+        ).forEach { (name, expected) -> assertEquals(name, expected, FoodCatalog.find(name)?.name) }
+    }
 }
