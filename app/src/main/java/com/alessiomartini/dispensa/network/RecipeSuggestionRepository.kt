@@ -56,12 +56,12 @@ class RecipeSuggestionRepository(
         )
     )
 
-    suspend fun suggestRecipes(pantryItemNames: List<String>, type: RecipeType): RecipeResult =
+    suspend fun suggestRecipes(pantryItemNames: List<String>, type: RecipeType, notes: String = ""): RecipeResult =
         withContext(Dispatchers.IO) {
             val settings = settingsRepository.settings.value
             if (settings.apiKey.isBlank()) return@withContext RecipeResult.NoApiKey
 
-            val prompt = buildPrompt(pantryItemNames, type)
+            val prompt = buildPrompt(pantryItemNames, type, notes)
             val requestBody = json.encodeToString(
                 GeminiRequest.serializer(),
                 GeminiRequest(
@@ -205,7 +205,9 @@ class RecipeSuggestionRepository(
         )
     }
 
-    private fun buildPrompt(pantryItemNames: List<String>, type: RecipeType): String {
+    private fun buildPrompt(pantryItemNames: List<String>, type: RecipeType, notes: String): String {
+        val userNotes = notes.trim().takeIf { it.isNotEmpty() }
+            ?.let { "\n\nExtra instructions from me (follow them): $it" }.orEmpty()
         val ingredients = pantryItemNames.joinToString(", ")
         val recipeKind = when (type) {
             RecipeType.MEAL -> "full meals (breakfast, lunch, or dinner - something substantial enough to eat as a meal)"
@@ -223,7 +225,7 @@ class RecipeSuggestionRepository(
             - "steps": short preparation steps (array of strings)
 
             Write everything in English.
-        """.trimIndent()
+        """.trimIndent() + userNotes
     }
 
     companion object {

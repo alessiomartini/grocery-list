@@ -16,10 +16,14 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -33,25 +37,36 @@ import com.alessiomartini.dispensa.network.RecipeType
 fun RecipesScreen(viewModel: RecipesViewModel) {
     val uiState by viewModel.uiState.collectAsState()
 
+    var notes by rememberSaveable { mutableStateOf("") }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
+        OutlinedTextField(
+            value = notes,
+            onValueChange = { notes = it },
+            label = { Text(stringResource(R.string.recipes_notes_hint)) },
+            modifier = Modifier.fillMaxWidth(),
+            minLines = 2,
+            maxLines = 4
+        )
+
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             Button(
-                onClick = { viewModel.suggestRecipes(RecipeType.SNACK) },
+                onClick = { viewModel.suggestRecipes(RecipeType.SNACK, notes) },
                 modifier = Modifier.weight(1f)
             ) {
                 Icon(Icons.Filled.Fastfood, contentDescription = null)
                 Text(" " + stringResource(R.string.recipes_suggest_snack_button))
             }
             Button(
-                onClick = { viewModel.suggestRecipes(RecipeType.MEAL) },
+                onClick = { viewModel.suggestRecipes(RecipeType.MEAL, notes) },
                 modifier = Modifier.weight(1f)
             ) {
                 Icon(Icons.Filled.Restaurant, contentDescription = null)

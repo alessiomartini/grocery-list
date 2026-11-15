@@ -37,6 +37,7 @@ here with a bit more detail so they don't get lost.
 None of these are started; there's no partial branch or scaffolding for them.
 
 ## Da fare
+- [x] Controllo del catalogo alimenti (nomi, icone, traduzioni) e box indicazioni nelle Ricette (2026-11-15)
 - [x] Interruttore per attivare/disattivare il multilingue e opzione per avere tre lingue (2026-11-14; solo preferenze, nessuna migrazione; il catalogo ha già en/it/nl, quindi nessun dato mancante)
 - [ ] Bug sync: alcuni alimenti non sono sincronizzati (nome inserito a mano, senza traduzione, senza maiuscola, senza icona): trovare la causa e sistemare (nota 2026-11-13)
 - [x] (catalogo esteso 2026-11-15; import storico: script pronto, da applicare) (dati pronti 2026-11-15: 346 prodotti distinti, frequenze e intervalli in `E:\Alessio\Dati-personali\lidl\statistiche.md` e `items.csv`, da `life-log/lidl.py`; resta confrontarli con `FoodCatalog.kt` e importare lo storico come `purchase_history`) Raccogliere gli scontrini e darli a Claude per aggiungere al catalogo gli alimenti mancanti e farsi suggerire alimenti nuovi (nota 2026-11-13)
@@ -137,6 +138,7 @@ in a shared database. **This does not fit Pantry and is not planned:**
   as a plan to build one soon.
 
 ## Log
+- 2026-11-15: controllo del catalogo sulla lista reale: +38 alimenti (spezie, salse, formaggi, ecc.), icone e traduzioni corrette; nelle Ricette una box per dare indicazioni a Gemini prima di premere Snack/Meal (non verificato in locale, solo CI)
 - 2026-11-15: archiviazione degli alimenti (stato `ARCHIVED`, nessuna migrazione Room; il Worker accetta il nuovo stato: serve il deploy del backend)
 - 2026-11-15: catalogo esteso con i nomi olandesi degli scontrini Lidl (PR #10, test `FoodCatalogTest`); `tools/import_lidl.py` importa lo storico (1.056 righe) in `purchase_history`, anteprima di default, `--apply` da lanciare da Alessio
 - 2026-11-14: 🤖 interruttore multilingue e opzione terza lingua nelle Impostazioni (solo preferenze); note dal sito portate nel ROADMAP
