@@ -18,7 +18,7 @@ class ItemRepository(private val dao: ItemDao, private val purchaseHistoryDao: P
     ) {
         dao.upsert(
             GroceryItem(
-                name = name.trim(),
+                name = FoodInfo.tidyName(name),
                 category = category,
                 status = ItemStatus.TO_BUY
             )
@@ -76,7 +76,7 @@ class ItemRepository(private val dao: ItemDao, private val purchaseHistoryDao: P
     ) {
         dao.update(
             item.copy(
-                name = name.trim(),
+                name = FoodInfo.tidyName(name),
                 category = category,
                 expiryDate = expiryDate,
                 expiryNotified = false,

@@ -39,7 +39,8 @@ None of these are started; there's no partial branch or scaffolding for them.
 ## Da fare
 - [x] Controllo del catalogo alimenti (nomi, icone, traduzioni) e box indicazioni nelle Ricette (2026-11-15)
 - [x] Interruttore per attivare/disattivare il multilingue e opzione per avere tre lingue (2026-11-14; solo preferenze, nessuna migrazione; il catalogo ha già en/it/nl, quindi nessun dato mancante)
-- [ ] Bug sync: alcuni alimenti non sono sincronizzati (nome inserito a mano, senza traduzione, senza maiuscola, senza icona): trovare la causa e sistemare (nota 2026-11-13)
+- [x] Bug sync: alcuni alimenti non sono sincronizzati (nome inserito a mano, senza traduzione, senza maiuscola, senza icona): trovare la causa e sistemare (nota 2026-11-13). Causa: la sync porta il nome tale e quale e il legame con il catalogo è solo il nome, confrontato in modo esatto (maiuscole sì, ma accenti e spazi doppi no); le righe da `pantry.py`/Worker restavano in "Other" con il nome grezzo (ricategorizzate solo al riavvio dell'app) e i nomi non di catalogo senza maiuscola. Fix: `FoodInfo.tidyName` (confronto senza accenti/spazi, nome di catalogo o maiuscola iniziale), `linkToCatalog` applicato a ogni riga scaricata e a ogni aggiunta/modifica, maiuscola iniziale anche nella visualizzazione; nessuna migrazione, Worker invariato. Da verificare sul telefono con una sync vera (nessuna build locale)
+- [ ] Verificare sul telefono che gli alimenti aggiunti da `pantry.py` arrivino con nome, icona, categoria e traduzioni del catalogo
 - [x] (catalogo esteso 2026-11-15; import storico: script pronto, da applicare) (dati pronti 2026-11-15: 346 prodotti distinti, frequenze e intervalli in `E:\Alessio\Dati-personali\lidl\statistiche.md` e `items.csv`, da `life-log/lidl.py`; resta confrontarli con `FoodCatalog.kt` e importare lo storico come `purchase_history`) Raccogliere gli scontrini e darli a Claude per aggiungere al catalogo gli alimenti mancanti e farsi suggerire alimenti nuovi (nota 2026-11-13)
 - [ ] Icone fuorvianti (mozzarella con la groviera, pasta con un piatto di pasta): usare immagini che ricordino il prodotto sullo scaffale (nota 2026-11-13)
 - [x] Tolta la quantità per prodotto (2026-11-09; colonne `quantity`/`unit` restano in Room e nel sync, nessuna migrazione)
@@ -138,7 +139,7 @@ in a shared database. **This does not fit Pantry and is not planned:**
   as a plan to build one soon.
 
 ## Log
-- 2026-11-21: 🤖 aggiunta suite di test automatici per il Worker di sync (`node:test` + D1 finto su `node:sqlite`, 20 test, nessuna dipendenza) e workflow CI `backend-test.yml`; il deploy non parte più per modifiche a test/README/package.json
+- 2026-11-21: 🤖 aggiunta suite di test automatici per il Worker di sync (`node:test` + D1 finto su `node:sqlite`, 20 test, nessuna dipendenza) e workflow CI `backend-test.yml`; il deploy non parte più per modifiche a test/README/package.json; corretto il bug di sync sugli alimenti non collegati al catalogo (nome grezzo, niente icona): nome e categoria ricollegati al catalogo su ogni riga scaricata e su aggiunta/modifica, con test unitari
 - 2026-11-15: aggiunti i pinoli (catalogo + in dispensa)
 - 2026-11-15: etichetta "in season / out of season" sostituita da un bollino colorato (verde / marrone) in alto a destra della scheda
 - 2026-11-15: nomi e categorie di 36 alimenti inseriti a mano sistemati nel database (nomi inglesi del catalogo, maiuscole, categorie sbagliate); lasciati come erano "Baking mix - biscottini rotondi" e il doppione "Ice cream"

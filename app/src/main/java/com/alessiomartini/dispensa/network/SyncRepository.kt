@@ -3,6 +3,7 @@ package com.alessiomartini.dispensa.network
 import com.alessiomartini.dispensa.data.GroceryItem
 import com.alessiomartini.dispensa.data.ItemDao
 import com.alessiomartini.dispensa.data.ItemStatus
+import com.alessiomartini.dispensa.data.linkToCatalog
 import com.alessiomartini.dispensa.data.PurchaseHistoryDao
 import com.alessiomartini.dispensa.data.PurchaseRecord
 import com.alessiomartini.dispensa.settings.SettingsRepository
@@ -222,8 +223,9 @@ class SyncRepository(
             for (dto in page.rows) {
                 val existing = itemDao.findByUuid(dto.uuid)
                 when {
-                    existing == null -> itemDao.upsert(dto.toEntity(localId = 0))
-                    dto.updatedAt > existing.updatedAt.toEpochMilli() -> itemDao.update(dto.toEntity(localId = existing.id))
+                    existing == null -> itemDao.upsert(linkToCatalog(dto.toEntity(localId = 0)))
+                    dto.updatedAt > existing.updatedAt.toEpochMilli() ->
+                        itemDao.update(linkToCatalog(dto.toEntity(localId = existing.id)))
                     // Otherwise the local copy is at least as new - typically our own push coming back.
                 }
             }
