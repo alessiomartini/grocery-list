@@ -254,11 +254,15 @@ object FoodCatalog {
     fun find(itemName: String): FoodCatalogItem? {
         val normalized = itemName.trim().lowercase()
         if (normalized.isEmpty()) return null
-        return items
-            .flatMap { item -> item.keywords.filter { normalized.contains(it) }.map { it to item } }
-            .maxByOrNull { (keyword, _) -> keyword.length }
-            ?.second
+        return bestMatch(normalized)
+            // No direct hit: plural/gender variants ("pomodori" -> "pomodoro"). Never overrides a direct hit.
+            ?: FoodInfo.inflectionVariants(normalized).firstNotNullOfOrNull { bestMatch(it) }
     }
+
+    private fun bestMatch(normalized: String): FoodCatalogItem? = items
+        .flatMap { item -> item.keywords.filter { normalized.contains(it) }.map { it to item } }
+        .maxByOrNull { (keyword, _) -> keyword.length }
+        ?.second
 
     fun iconFor(itemName: String, category: String? = null): String {
         find(itemName)?.let { return it.icon }

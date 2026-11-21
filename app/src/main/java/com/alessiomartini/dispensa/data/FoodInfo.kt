@@ -147,7 +147,65 @@ object FoodInfo {
     }
 
     /** Catalog item whose English/Italian/Dutch name or alias is exactly [name] (case, accents and spacing ignored). */
-    private fun exact(name: String): FoodCatalogItem? = exactIndex[normalizeKey(name)]
+    private fun exact(name: String): FoodCatalogItem? {
+        exactIndex[normalizeKey(name)]?.let { return it }
+        // Only when there is no exact hit: try plural/gender variants ("pomodori" -> "pomodoro").
+        return inflectionVariants(normalizeKey(name)).firstNotNullOfOrNull { exactIndex[it] }
+    }
+
+    /** Irregular Italian plurals the suffix rules cannot derive (both directions). */
+    private val irregularForms = mapOf("uova" to "uovo", "uovo" to "uova")
+
+    /** Other forms of one lowercase word: singular first (mele -> mela), then plural (fungo -> funghi). Words under 4 letters are left alone. */
+    private fun wordForms(w: String): List<String> {
+        if (w.length < 4 || !w.all { it.isLetter() }) return emptyList()
+        val out = LinkedHashSet<String>()
+        irregularForms[w]?.let { out += it }
+        // Italian plural -> singular.
+        when {
+            w.length >= 5 && w.endsWith("chi") -> out += w.dropLast(2) + "o"
+            w.length >= 5 && w.endsWith("ghi") -> out += w.dropLast(2) + "o"
+            w.length >= 5 && w.endsWith("che") -> out += w.dropLast(2) + "a"
+            w.length >= 5 && w.endsWith("ghe") -> out += w.dropLast(2) + "a"
+        }
+        if (w.endsWith("i")) { out += w.dropLast(1) + "o"; out += w.dropLast(1) + "e" }
+        if (w.endsWith("e")) out += w.dropLast(1) + "a"
+        // English plural -> singular.
+        if (w.length >= 5 && w.endsWith("ies")) out += w.dropLast(3) + "y"
+        if (w.length >= 5 && w.endsWith("oes")) out += w.dropLast(2)
+        if (w.endsWith("s") && !w.endsWith("ss")) out += w.dropLast(1)
+        // Singular -> plural, for catalog names stored in the plural ("fungo" -> "funghi", "lentil" -> "lentils").
+        when {
+            w.endsWith("co") -> out += w.dropLast(2) + "chi"
+            w.endsWith("go") -> out += w.dropLast(2) + "ghi"
+            w.endsWith("ca") -> out += w.dropLast(2) + "che"
+            w.endsWith("ga") -> out += w.dropLast(2) + "ghe"
+        }
+        if (w.endsWith("o")) out += w.dropLast(1) + "i"
+        if (w.endsWith("a")) out += w.dropLast(1) + "e"
+        if (!w.endsWith("s")) out += w + "s"
+        out.remove(w)
+        return out.toList()
+    }
+
+    /**
+     * Plural/singular and gender variants of [name] (lowercase), best guess first, never [name]
+     * itself. Callers try the exact name first and use these only as a fallback.
+     */
+    fun inflectionVariants(name: String): List<String> {
+        val words = name.trim().lowercase().split(Regex("\\s+")).filter { it.isNotEmpty() }
+        val forms = words.map { wordForms(it) }
+        val out = LinkedHashSet<String>()
+        // Every word at its best variant ("mele verdi" -> "mela verde"), then one word at a time.
+        if (forms.any { it.isNotEmpty() }) {
+            out += words.indices.joinToString(" ") { forms[it].firstOrNull() ?: words[it] }
+        }
+        for (i in words.indices.reversed()) for (f in forms[i]) {
+            out += words.mapIndexed { j, w -> if (j == i) f else w }.joinToString(" ")
+        }
+        out.remove(words.joinToString(" "))
+        return out.toList()
+    }
 
     /**
      * Name to store for a hand-typed or synced item: whitespace collapsed, and either the catalog's
