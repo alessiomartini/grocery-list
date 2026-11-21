@@ -4,6 +4,7 @@ on:
   push:
     paths:
       - 'backend/**'
+      - '.github/workflows/deploy-worker.yml'
       # Test, README e package.json non cambiano il Worker: non devono rilanciare il deploy.
       - '!backend/test/**'
       - '!backend/README.md'
