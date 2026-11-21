@@ -163,10 +163,10 @@ object FoodInfo {
         irregularForms[w]?.let { out += it }
         // Italian plural -> singular.
         when {
-            w.length >= 5 && w.endsWith("chi") -> out += w.dropLast(2) + "co"
-            w.length >= 5 && w.endsWith("ghi") -> out += w.dropLast(2) + "go"
-            w.length >= 5 && w.endsWith("che") -> out += w.dropLast(2) + "ca"
-            w.length >= 5 && w.endsWith("ghe") -> out += w.dropLast(2) + "ga"
+            w.length >= 5 && w.endsWith("chi") -> out += w.dropLast(2) + "o"
+            w.length >= 5 && w.endsWith("ghi") -> out += w.dropLast(2) + "o"
+            w.length >= 5 && w.endsWith("che") -> out += w.dropLast(2) + "a"
+            w.length >= 5 && w.endsWith("ghe") -> out += w.dropLast(2) + "a"
         }
         if (w.endsWith("i")) { out += w.dropLast(1) + "o"; out += w.dropLast(1) + "e" }
         if (w.endsWith("e")) out += w.dropLast(1) + "a"

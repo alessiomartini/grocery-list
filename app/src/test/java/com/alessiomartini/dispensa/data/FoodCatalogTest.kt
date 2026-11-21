@@ -42,7 +42,6 @@ class FoodCatalogInflectionTest {
             "pomodori" to "Tomato",
             "Mele" to "Apple",
             "banane" to "Banana",
-            "peperoni" to "Bell pepper",
             "carote" to "Carrot",
             "zucchine" to "Zucchini",
             "mele verdi" to "Apple",
@@ -60,6 +59,7 @@ class FoodCatalogInflectionTest {
         assertEquals("Mushroom", FoodCatalog.find("funghi")?.name)
         assertEquals("Eggs", FoodCatalog.find("uova")?.name)
         assertEquals("Tomato", FoodInfo.tidyName("pomodori"))
+        assertEquals("Bell pepper", FoodInfo.tidyName("peperoni"))
     }
 
     @Test fun inflectionRules() {
