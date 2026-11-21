@@ -92,30 +92,38 @@ object FoodInfo {
     )
 
     /**
-     * Months (1-12) in which the product is on the Dutch market from Dutch growing (open ground,
-     * greenhouse or storage). Basis: Milieu Centraal groente- en fruitkalender
-     * (groentefruit.milieucentraal.nl, Dutch-origin columns), rounded to whole months.
-     * Fruit/veg not listed here (banana, citrus, avocado, pineapple, grapes, watermelon, garlic)
-     * are imported all year, so they get no season label.
+     * Months (1-12) in which the product is in season in the Netherlands. Source: Milieu Centraal
+     * "groente- en fruitkalender" (PDF linked from
+     * https://www.milieucentraal.nl/eten-en-drinken/milieubewust-eten/groente-en-fruit/, made by
+     * Voedingscentrum from Velt/Bionext data, 2023), consulted 2026-11-21. Rule: a month counts when the
+     * product is listed in that month's column of the calendar (Dutch-grown, including storage and
+     * the early/late months the calendar lists); imports are not counted.
+     * Fruit/veg not in the calendar (banana, citrus, avocado, pineapple, ginger, garlic, chili) are
+     * imported all year, so they get no season label.
+     * Not verifiable: "potato" (not in the calendar, kept as all year), "berries" (mixed group, no label).
+     * Calendar names: aardbei, appel, wortel, ui, broccoli, kropsla, tomaat, komkommer, paprika,
+     * paddenstoelen, mais, aubergine, courgette, bleekselderij, prei, bloemkool, andijvie, venkel.
      */
     private val dutchSeason: Map<String, Set<Int>> = mapOf(
-        "apple" to (setOf(1, 2, 3, 4) + (8..12)),
-        "strawberry" to (5..9).toSet(),
-        "tomato" to (5..10).toSet(),
+        "apple" to (1..5).toSet() + (8..12),
+        "strawberry" to (4..8).toSet(),
+        "tomato" to (6..10).toSet(),
         "potato" to (1..12).toSet(),
         "carrot" to (1..12).toSet(),
         "onion" to (1..12).toSet(),
         "broccoli" to (6..11).toSet(),
         "lettuce" to (5..10).toSet(),
-        "cucumber" to (5..10).toSet(),
-        "bell pepper" to (6..10).toSet(),
+        "cucumber" to (7..10).toSet(),
+        "bell pepper" to (7..10).toSet(),
         "mushroom" to (1..12).toSet(),
-        "corn" to (8..10).toSet(),
+        "corn" to (8..9).toSet(),
         "eggplant" to (7..10).toSet(),
-        "zucchini" to (6..10).toSet(),
-        "celery" to (7..10).toSet(),
-        "leeks" to (setOf(1, 2, 3, 4) + (7..12)),
-        "cauliflower" to (6..11).toSet()
+        "zucchini" to (7..11).toSet(),
+        "celery" to (7..11).toSet(),
+        "leeks" to (1..12).toSet(),
+        "cauliflower" to (3..11).toSet(),
+        "endive" to (4..12).toSet(),
+        "fennel" to (6..11).toSet()
     )
 
     /** Italian/Dutch names of [englishName], for [FoodCatalogItem.keywords]. */
