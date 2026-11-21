@@ -1,20 +1,20 @@
 # Roadmap
 
 <!--
-Unico file per todo, idee, decisioni e diario, letto da Projects Overview
-(https://alessiomartini.github.io/projects-overview/). Protocollo: templates/ROADMAP.md di projects-overview.
+Single file for todos, ideas, decisions and diary, read by Projects Overview
+(https://alessiomartini.github.io/projects-overview/). Protocol: templates/ROADMAP.md of projects-overview.
 -->
 
-## Idee
-- [ ] Dal brief del mattino: se in Google Tasks c'è un task tipo "aggiungi alimento alla lista della spesa", il brief lo legge e aggiorna la lista nell'app. Parole di Alessio: "voglio implementare la funzione che se c'e' qualcosa nei tasks che dice "aggiungi alimento alla liste della spesa" allora il brief prende l'istruzione e modifica la lista nell'app Pantry" (da google-tasks, task "Fare la spesa e compilare la lista della spesa", 2026-11-07)
-- [ ] Scansione di codici a barre / scontrini
-- [ ] Backup della dispensa su Google Drive
-- [ ] Quantità minime per categoria
-- [ ] Widget per la schermata Home
-- [ ] Pull-to-refresh: scorrere verso l'alto in cima alla lista la ricarica e avvia la sincronizzazione
-- [ ] Sincronizzazione automatica all'apertura dell'app
-- [ ] Nomi degli alimenti con la prima lettera maiuscola
-- [ ] Nomi degli alimenti in inglese
+## Ideas
+- [ ] From the morning brief: if Google Tasks has a task like "add food item to the shopping list", the brief reads it and updates the list in the app. Alessio's words: "voglio implementare la funzione che se c'e' qualcosa nei tasks che dice "aggiungi alimento alla liste della spesa" allora il brief prende l'istruzione e modifica la lista nell'app Pantry" (from google-tasks, task "Fare la spesa e compilare la lista della spesa", 2026-11-07)
+- [ ] Barcode / receipt scanning
+- [ ] Pantry backup to Google Drive
+- [ ] Minimum quantities per category
+- [ ] Home screen widget
+- [ ] Pull-to-refresh: pulling down at the top of the list reloads it and starts the sync
+- [ ] Automatic sync when the app opens
+- [ ] Food names with a capital first letter
+- [ ] Food names in English
 
 ### Ideas from the README, expanded
 
@@ -36,37 +36,37 @@ here with a bit more detail so they don't get lost.
 
 None of these are started; there's no partial branch or scaffolding for them.
 
-## Da fare
-- [x] Abbinamento al catalogo anche per plurali e genere ("pomodori" → pomodoro, "mele" → mela): idea della PR #8, chiusa perché superata da #18 (che ignora solo maiuscole, accenti e spazi); da fare dopo aver provato #18 sul telefono
-- [x] Controllo del catalogo alimenti (nomi, icone, traduzioni) e box indicazioni nelle Ricette (2026-11-15)
-- [x] Interruttore per attivare/disattivare il multilingue e opzione per avere tre lingue (2026-11-14; solo preferenze, nessuna migrazione; il catalogo ha già en/it/nl, quindi nessun dato mancante)
-- [x] Bug sync: alcuni alimenti non sono sincronizzati (nome inserito a mano, senza traduzione, senza maiuscola, senza icona): trovare la causa e sistemare (nota 2026-11-13). Causa: la sync porta il nome tale e quale e il legame con il catalogo è solo il nome, confrontato in modo esatto (maiuscole sì, ma accenti e spazi doppi no); le righe da `pantry.py`/Worker restavano in "Other" con il nome grezzo (ricategorizzate solo al riavvio dell'app) e i nomi non di catalogo senza maiuscola. Fix: `FoodInfo.tidyName` (confronto senza accenti/spazi, nome di catalogo o maiuscola iniziale), `linkToCatalog` applicato a ogni riga scaricata e a ogni aggiunta/modifica, maiuscola iniziale anche nella visualizzazione; nessuna migrazione, Worker invariato. Da verificare sul telefono con una sync vera (nessuna build locale)
-- [ ] Verificare sul telefono che gli alimenti aggiunti da `pantry.py` arrivino con nome, icona, categoria e traduzioni del catalogo
-- [x] (catalogo esteso 2026-11-15; import storico: script pronto, da applicare) (dati pronti 2026-11-15: 346 prodotti distinti, frequenze e intervalli in `E:\Alessio\Dati-personali\lidl\statistiche.md` e `items.csv`, da `life-log/lidl.py`; resta confrontarli con `FoodCatalog.kt` e importare lo storico come `purchase_history`) Raccogliere gli scontrini e darli a Claude per aggiungere al catalogo gli alimenti mancanti e farsi suggerire alimenti nuovi (nota 2026-11-13)
-- [ ] Icone fuorvianti (mozzarella con la groviera, pasta con un piatto di pasta): usare immagini che ricordino il prodotto sullo scaffale (nota 2026-11-13)
-- [x] Tolta la quantità per prodotto (2026-11-09; colonne `quantity`/`unit` restano in Room e nel sync, nessuna migrazione)
-- [x] Tag stagionalità per frutta/verdura (tabella mensile Paesi Bassi in `FoodInfo.kt`)
-- [x] Nomi in due lingue (it + nl di default, configurabili in Impostazioni) per i prodotti del catalogo
-- [x] Modifica della lista dal computer: `tools/pantry.py` (list/add/remove) sul D1 condiviso; l'app sincronizza da sola
-- [ ] Stagionalità: dove vivi → coltivato vicino o lontano (rimandato: serve un paese in Impostazioni e una tabella di origine per prodotto)
-- [ ] Nome del prodotto in due lingue per prodotti fuori catalogo (serve una colonna nuova in Room + D1 + sync; oggi solo catalogo)
-- [x] Verificare la tabella stagionale con il calendario Milieu Centraal aggiornato (PDF del 2010 incompleto, tabella arrotondata a mesi)
-  - restano non verificabili: patata (assente dal calendario, lasciata tutto l'anno) e frutti di bosco (gruppo misto, nessuna etichetta)
-- [ ] Icone: oggi sono emoji nel catalogo (nessun set di icone nel repo); icona del launcher da ridisegnare solo se Alessio ne indica una
-- [ ] Categorie e catalogo dal server invece che nel codice: oggi `Categories.SUGGESTED` e `FoodCatalog` (categoria, icona, durata, alias di ogni alimento) sono scritti nell'APK, quindi una categoria nuova o un alimento spostato richiede un aggiornamento dell'app. Le modifiche ai prodotti nel D1 arrivano già col sync; l'obiettivo è che basti un sync anche per categorie e catalogo (es. tabelle `categories`/`catalog` nel D1 scaricate dal Worker, con il catalogo nell'APK come fallback offline)
+## To do
+- [x] Catalog matching also for plurals and gender ("pomodori" → pomodoro, "mele" → mela): idea from PR #8, closed because superseded by #18 (which only ignores case, accents and spaces); to do after trying #18 on the phone
+- [x] Food catalog check (names, icons, translations) and a guidance box in Recipes (2026-11-15)
+- [x] Switch to turn multilingual on/off and option to have three languages (2026-11-14; preferences only, no migration; the catalog already has en/it/nl, so no missing data)
+- [x] Sync bug: some food items are not synced (name typed by hand, no translation, no capital letter, no icon): find the cause and fix it (note 2026-11-13). Cause: sync carries the name as-is and the link to the catalog is only the name, compared exactly (case yes, but accents and double spaces no); rows from `pantry.py`/Worker stayed in "Other" with the raw name (recategorized only when the app restarted) and non-catalog names had no capital letter. Fix: `FoodInfo.tidyName` (comparison ignoring accents/spaces, catalog name or initial capital), `linkToCatalog` applied to every downloaded row and to every add/edit, initial capital also in the display; no migration, Worker unchanged. To verify on the phone with a real sync (no local build)
+- [ ] Verify on the phone that food items added by `pantry.py` arrive with the catalog's name, icon, category and translations
+- [x] (catalog extended 2026-11-15; history import: script ready, to be applied) (data ready 2026-11-15: 346 distinct products, frequencies and intervals in `E:\Alessio\Dati-personali\lidl\statistiche.md` and `items.csv`, from `life-log/lidl.py`; what remains is comparing them with `FoodCatalog.kt` and importing the history as `purchase_history`) Collect the receipts and give them to Claude to add the missing food items to the catalog and get new items suggested (note 2026-11-13)
+- [ ] Misleading icons (mozzarella with the Gruyère, pasta with a plate of pasta): use images that recall the product on the shelf (note 2026-11-13)
+- [x] Removed the quantity per product (2026-11-09; `quantity`/`unit` columns stay in Room and in the sync, no migration)
+- [x] Seasonality tag for fruit/vegetables (monthly Netherlands table in `FoodInfo.kt`)
+- [x] Names in two languages (it + nl by default, configurable in Settings) for catalog products
+- [x] Editing the list from the computer: `tools/pantry.py` (list/add/remove) on the shared D1; the app syncs by itself
+- [ ] Seasonality: where you live → grown nearby or far away (postponed: needs a country in Settings and an origin table per product)
+- [ ] Product name in two languages for non-catalog products (needs a new column in Room + D1 + sync; today catalog only)
+- [x] Verify the seasonal table against the updated Milieu Centraal calendar (2010 PDF incomplete, table rounded to months)
+  - still not verifiable: potato (absent from the calendar, left year-round) and berries (mixed group, no label)
+- [ ] Icons: today they are emoji in the catalog (no icon set in the repo); redraw the launcher icon only if Alessio specifies one
+- [ ] Categories and catalog from the server instead of in the code: today `Categories.SUGGESTED` and `FoodCatalog` (category, icon, shelf life, aliases of each food item) are written in the APK, so a new category or a moved food item requires an app update. Product changes in the D1 already arrive with the sync; the goal is that a sync is enough also for categories and catalog (e.g. `categories`/`catalog` tables in the D1 downloaded by the Worker, with the catalog in the APK as an offline fallback)
 
-## Da verificare
-- [x] Test del backend di sync (`npm test` in `backend/`, 20 test con D1 finto su `node:sqlite`)
-- [ ] Sync end-to-end dal telefono (Impostazioni → "Sync & backup" → Sync now) contro il Worker vero: finora verificati solo migrazione su SQLite con dati finti e formato JSON contro `validateItem`
-- [ ] I modelli Gemini di riserva (`gemini-2.5-flash`, `gemini-2.5-flash-lite`, `gemini-2.0-flash`) esistono ancora per la chiave in uso: uno ritirato viene saltato (404), ma se lo fossero tutti le ricette fallirebbero
+## To verify
+- [x] Sync backend tests (`npm test` in `backend/`, 20 tests with a fake D1 on `node:sqlite`)
+- [ ] End-to-end sync from the phone (Settings → "Sync & backup" → Sync now) against the real Worker: so far only migration on SQLite with fake data and JSON format against `validateItem` have been verified
+- [ ] The fallback Gemini models (`gemini-2.5-flash`, `gemini-2.5-flash-lite`, `gemini-2.0-flash`) still exist for the key in use: a retired one is skipped (404), but if all of them were, recipes would fail
 
-## Decisioni e cose provate
+## Decisions and things tried
 
 This file collects ideas that are not implemented yet, things left half-done, and
 explicit "not doing this" decisions with their reasoning — so a future session
 (human or Claude Code) doesn't have to rediscover the context.
 
-- 2026-11-21: stagionalità verificata sul calendario Milieu Centraal (PDF "Groente- en fruitkalender" linkato da milieucentraal.nl/eten-en-drinken/milieubewust-eten/groente-en-fruit/, dic 2023, dati Velt/Bionext; il vecchio sito groentefruit.milieucentraal.nl non risponde più). Regola: mese in stagione = prodotto elencato nella colonna di quel mese (coltivato nei Paesi Bassi, import escluso). 10 prodotti su 17 corretti (es. pomodoro 5-10 → 6-10, fragola 5-9 → 4-8, cetriolo 5-10 → 7-10, porro 1-4+7-12 → tutto l'anno, cavolfiore 6-11 → 3-11, mais 8-10 → 8-9), aggiunti indivia e finocchio; patata non verificabile.
+- 2026-11-21: seasonality verified against the Milieu Centraal calendar (PDF "Groente- en fruitkalender" linked from milieucentraal.nl/eten-en-drinken/milieubewust-eten/groente-en-fruit/, Dec 2023, Velt/Bionext data; the old site groentefruit.milieucentraal.nl no longer responds). Rule: a month is in season = product listed in that month's column (grown in the Netherlands, imports excluded). 10 products out of 17 corrected (e.g. tomato 5-10 → 6-10, strawberry 5-9 → 4-8, cucumber 5-10 → 7-10, leek 1-4+7-12 → year-round, cauliflower 6-11 → 3-11, corn 8-10 → 8-9), added chicory and fennel; potato not verifiable.
 ### Left half-done / worth double-checking
 
 - The app now syncs with the backend (`network/SyncRepository.kt`, Settings →
@@ -142,15 +142,15 @@ in a shared database. **This does not fit Pantry and is not planned:**
   as a plan to build one soon.
 
 ## Log
-- 2026-11-21: 🤖 abbinamento al catalogo anche per plurali e genere (regole italiane -i/-e/-chi/-ghi/-che/-ghe, uova/uovo, plurali inglesi, anche al contrario) solo come ripiego dopo il match diretto, con test; chiusa la PR #8 (superata da #18), abbinamento dei plurali annotato come da fare; 🤖 verificata la tabella stagionale NL sul calendario Milieu Centraal (10 prodotti corretti, aggiunti indivia e finocchio, fonte e regola citate nel codice, test aggiornati); aggiunta suite di test automatici per il Worker di sync (`node:test` + D1 finto su `node:sqlite`, 20 test, nessuna dipendenza) e workflow CI `backend-test.yml`; il deploy non parte più per modifiche a test/README/package.json; corretto il bug di sync sugli alimenti non collegati al catalogo (nome grezzo, niente icona): nome e categoria ricollegati al catalogo su ogni riga scaricata e su aggiunta/modifica, con test unitari
-- 2026-11-15: aggiunti i pinoli (catalogo + in dispensa)
-- 2026-11-15: etichetta "in season / out of season" sostituita da un bollino colorato (verde / marrone) in alto a destra della scheda
-- 2026-11-15: nomi e categorie di 36 alimenti inseriti a mano sistemati nel database (nomi inglesi del catalogo, maiuscole, categorie sbagliate); lasciati come erano "Baking mix - biscottini rotondi" e il doppione "Ice cream"
-- 2026-11-15: controllo del catalogo sulla lista reale: +38 alimenti (spezie, salse, formaggi, ecc.), icone e traduzioni corrette; nelle Ricette una box per dare indicazioni a Gemini prima di premere Snack/Meal (non verificato in locale, solo CI)
-- 2026-11-15: archiviazione degli alimenti (stato `ARCHIVED`, nessuna migrazione Room; il Worker accetta il nuovo stato: serve il deploy del backend)
-- 2026-11-15: catalogo esteso con i nomi olandesi degli scontrini Lidl (PR #10, test `FoodCatalogTest`); `tools/import_lidl.py` importa lo storico (1.056 righe) in `purchase_history`, anteprima di default, `--apply` da lanciare da Alessio
-- 2026-11-14: 🤖 interruttore multilingue e opzione terza lingua nelle Impostazioni (solo preferenze); note dal sito portate nel ROADMAP
-- 2026-11-09: da task Google: tolta la quantità, tag stagionalità NL, nomi it/nl, `tools/pantry.py` per la lista dal computer (icone e "dove vivi" rimandati)
-- 2026-10-19: todo: categorie e catalogo sincronizzati dal server; nuova categoria "Herbs and spices" (sale, pepe, curry, prezzemolo, menta e spezie secche nel catalogo); corrette a mano le categorie di 4 prodotti nel D1; sync app↔backend (Room v3 con uuid/updatedAt/soft delete), retry e fallback dei modelli Gemini su 429/503, ricategorizzazione automatica dei prodotti in "Other", fix della CI (pacchetto `tools` di setup-android); risolto il crash da downgrade del database e allineato `main` al branch; prima sync riuscita (91 prodotti sul server) e catalogo esteso perché li riconosca tutti
-- 2026-10-18: FUTURE-ARCHITECTURE.md unito in ROADMAP.md (protocollo unico)
-- 2026-10-15: creata la roadmap per Projects Overview
+- 2026-11-21: 🤖 catalog matching also for plurals and gender (Italian rules -i/-e/-chi/-ghi/-che/-ghe, uova/uovo, English plurals, also in reverse) only as a fallback after the direct match, with tests; closed PR #8 (superseded by #18), plural matching noted as to do; 🤖 verified the NL seasonal table against the Milieu Centraal calendar (10 products corrected, added chicory and fennel, source and rule cited in the code, tests updated); added an automated test suite for the sync Worker (`node:test` + fake D1 on `node:sqlite`, 20 tests, no dependencies) and the CI workflow `backend-test.yml`; deploy no longer starts for changes to tests/README/package.json; fixed the sync bug on food items not linked to the catalog (raw name, no icon): name and category re-linked to the catalog on every downloaded row and on add/edit, with unit tests; 🤖 ROADMAP translated to English (language rule)
+- 2026-11-15: added pine nuts (catalog + in the pantry)
+- 2026-11-15: "in season / out of season" label replaced by a colored dot (green / brown) at the top right of the card
+- 2026-11-15: names and categories of 36 hand-entered food items fixed in the database (English catalog names, capitals, wrong categories); left as they were "Baking mix - biscottini rotondi" and the duplicate "Ice cream"
+- 2026-11-15: catalog check on the real list: +38 food items (spices, sauces, cheeses, etc.), icons and translations fixed; in Recipes a box to give Gemini guidance before pressing Snack/Meal (not verified locally, CI only)
+- 2026-11-15: archiving of food items (`ARCHIVED` state, no Room migration; the Worker accepts the new state: backend deploy needed)
+- 2026-11-15: catalog extended with the Dutch names from the Lidl receipts (PR #10, `FoodCatalogTest` test); `tools/import_lidl.py` imports the history (1,056 rows) into `purchase_history`, preview by default, `--apply` to be run by Alessio
+- 2026-11-14: 🤖 multilingual switch and third-language option in Settings (preferences only); notes from the site brought into the ROADMAP
+- 2026-11-09: from Google tasks: removed the quantity, NL seasonality tag, it/nl names, `tools/pantry.py` for the list from the computer (icons and "where you live" postponed)
+- 2026-10-19: todo: categories and catalog synced from the server; new category "Herbs and spices" (salt, pepper, curry, parsley, mint and dried spices in the catalog); manually fixed the categories of 4 products in the D1; app↔backend sync (Room v3 with uuid/updatedAt/soft delete), retry and fallback of the Gemini models on 429/503, automatic recategorization of products in "Other", CI fix (setup-android `tools` package); fixed the crash from the database downgrade and aligned `main` with the branch; first successful sync (91 products on the server) and catalog extended so that it recognizes them all
+- 2026-10-18: FUTURE-ARCHITECTURE.md merged into ROADMAP.md (single protocol)
+- 2026-10-15: roadmap created for Projects Overview
