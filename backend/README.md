@@ -61,6 +61,9 @@ ricrearlo da zero.
 
 ## Test
 
-`npm test` non e' configurato: il Worker non ha dipendenze. La logica di last-write-wins
-si verifica direttamente sul database, provando a riscrivere una riga con un `updated_at`
-piu' vecchio e controllando che `changes` resti `0`.
+Da `backend/` basta `npm test` (richiede Node 22.5 o piu' recente, nessuna dipendenza da
+installare): usa `node --test` e un finto D1 in memoria (`test/fake-d1.js`) basato su
+`node:sqlite`, che esegue lo `schema.sql` vero. Copre autenticazione, validazione, push/pull,
+last-write-wins (una riga con `updated_at` piu' vecchio non sovrascrive), cancellazioni soft e
+paginazione, con dati finti e senza rete. Il controllo manuale su D1 (riscrivere una riga con un
+`updated_at` piu' vecchio e verificare che `changes` resti `0`) resta utile contro il database vero.
