@@ -53,7 +53,7 @@ None of these are started; there's no partial branch or scaffolding for them.
 - [ ] Categorie e catalogo dal server invece che nel codice: oggi `Categories.SUGGESTED` e `FoodCatalog` (categoria, icona, durata, alias di ogni alimento) sono scritti nell'APK, quindi una categoria nuova o un alimento spostato richiede un aggiornamento dell'app. Le modifiche ai prodotti nel D1 arrivano già col sync; l'obiettivo è che basti un sync anche per categorie e catalogo (es. tabelle `categories`/`catalog` nel D1 scaricate dal Worker, con il catalogo nell'APK come fallback offline)
 
 ## Da verificare
-- [ ] Test del backend di sync (oggi `npm test` non è configurato)
+- [x] Test del backend di sync (`npm test` in `backend/`, 20 test con D1 finto su `node:sqlite`)
 - [ ] Sync end-to-end dal telefono (Impostazioni → "Sync & backup" → Sync now) contro il Worker vero: finora verificati solo migrazione su SQLite con dati finti e formato JSON contro `validateItem`
 - [ ] I modelli Gemini di riserva (`gemini-2.5-flash`, `gemini-2.5-flash-lite`, `gemini-2.0-flash`) esistono ancora per la chiave in uso: uno ritirato viene saltato (404), ma se lo fossero tutti le ricette fallirebbero
 
@@ -138,6 +138,7 @@ in a shared database. **This does not fit Pantry and is not planned:**
   as a plan to build one soon.
 
 ## Log
+- 2026-11-21: 🤖 aggiunta suite di test automatici per il Worker di sync (`node:test` + D1 finto su `node:sqlite`, 20 test, nessuna dipendenza) e workflow CI `backend-test.yml`; il deploy non parte più per modifiche a test/README/package.json
 - 2026-11-15: aggiunti i pinoli (catalogo + in dispensa)
 - 2026-11-15: etichetta "in season / out of season" sostituita da un bollino colorato (verde / marrone) in alto a destra della scheda
 - 2026-11-15: nomi e categorie di 36 alimenti inseriti a mano sistemati nel database (nomi inglesi del catalogo, maiuscole, categorie sbagliate); lasciati come erano "Baking mix - biscottini rotondi" e il doppione "Ice cream"
