@@ -56,6 +56,9 @@ if args.cmd == "list":
     for i in sorted(all_items(), key=lambda i: (i["status"], i["category"], i["name"])):
         print(f'{i["status"]:9} {i["category"]:22} {i["name"]}')
 elif args.cmd == "add":
+    # Solo spazi e maiuscola iniziale: il collegamento al catalogo (nome inglese, categoria, icona,
+    # traduzioni) lo fa l'app alla prima sync (data/CatalogLink.kt), che ha il catalogo.
+    args.name = " ".join(args.name.split()).capitalize() if args.name.islower() else " ".join(args.name.split())
     push({"uuid": str(uuid.uuid4()), "name": args.name, "quantity": 1, "unit": "", "category": args.category,
           "status": "TO_BUY", "expiryEpochDay": None, "addedAt": now, "statusChangedAt": now,
           "expiryNotified": False, "deleted": False, "updatedAt": now})

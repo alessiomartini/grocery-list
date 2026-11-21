@@ -1,5 +1,6 @@
 package com.alessiomartini.dispensa.data
 
+import java.text.Normalizer
 import java.time.LocalDate
 
 /**
@@ -121,18 +122,41 @@ object FoodInfo {
     fun translationsOf(englishName: String): List<String> =
         translations[englishName.lowercase()]?.toList().orEmpty()
 
-    /** Catalog item whose English/Italian/Dutch name or alias is exactly [name] (not a substring match). */
-    private fun exact(name: String): FoodCatalogItem? {
-        val n = name.trim().lowercase()
-        return FoodCatalog.items.firstOrNull { item ->
-            n in item.keywords || translationsOf(item.name).any { it.lowercase() == n }
+    /** Lowercase, accent-free, whitespace-collapsed form used to compare names ("  Caffè  " == "caffe"). */
+    fun normalizeKey(name: String): String =
+        Normalizer.normalize(name.trim(), Normalizer.Form.NFD)
+            .replace(Regex("\\p{M}+"), "")
+            .lowercase()
+            .replace(Regex("\\s+"), " ")
+
+    /** Normalised English/Italian/Dutch name or alias -> catalog item; first catalog entry wins. */
+    private val exactIndex: Map<String, FoodCatalogItem> by lazy {
+        val index = HashMap<String, FoodCatalogItem>()
+        for (item in FoodCatalog.items) {
+            for (key in item.keywords + translationsOf(item.name)) index.putIfAbsent(normalizeKey(key), item)
         }
+        index
+    }
+
+    /** Catalog item whose English/Italian/Dutch name or alias is exactly [name] (case, accents and spacing ignored). */
+    private fun exact(name: String): FoodCatalogItem? = exactIndex[normalizeKey(name)]
+
+    /**
+     * Name to store for a hand-typed or synced item: whitespace collapsed, and either the catalog's
+     * own spelling (when the text is exactly a catalog name/alias in any language, so "latte" and
+     * "LATTE " become "Milk" and get icon, translations and season) or at least a leading capital.
+     */
+    fun tidyName(name: String): String {
+        val collapsed = name.trim().replace(Regex("\\s+"), " ")
+        exact(collapsed)?.let { return it.name }
+        return collapsed.replaceFirstChar { it.uppercase() }
     }
 
     /** "Latte / Melk" for a catalog item shown in [langs] ("en", "it", "nl"); anything else stays as typed. */
     fun displayName(name: String, langs: List<String>): String {
-        val item = exact(name) ?: return name
-        val t = translations[item.name.lowercase()] ?: return name
+        val shownAsTyped = name.trim().replaceFirstChar { it.uppercase() }
+        val item = exact(name) ?: return shownAsTyped
+        val t = translations[item.name.lowercase()] ?: return shownAsTyped
         val shown = langs.mapNotNull {
             when (it) {
                 "en" -> item.name
@@ -141,7 +165,7 @@ object FoodInfo {
                 else -> null
             }
         }.distinct()
-        return if (shown.isEmpty()) name else shown.joinToString(" / ")
+        return if (shown.isEmpty()) shownAsTyped else shown.joinToString(" / ")
     }
 
     /** true = in Dutch season this month, false = out of season, null = no season info. */
