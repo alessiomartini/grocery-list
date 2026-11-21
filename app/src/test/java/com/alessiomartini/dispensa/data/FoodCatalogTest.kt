@@ -1,6 +1,7 @@
 package com.alessiomartini.dispensa.data
 
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Test
 
 /** Names as printed on Lidl receipts (2024-2026) must resolve to the intended catalog item. */
@@ -31,5 +32,47 @@ class FoodCatalogTest {
             "Chickpeas" to "Chickpeas",
             "Sweet chili sauce" to "Hot sauce",
         ).forEach { (name, expected) -> assertEquals(name, expected, FoodCatalog.find(name)?.name) }
+    }
+}
+
+/** Italian plural/gender variants are only a fallback after the exact/substring match. */
+class FoodCatalogInflectionTest {
+    @Test fun pluralsMatchSingularItems() {
+        mapOf(
+            "pomodori" to "Tomato",
+            "Mele" to "Apple",
+            "banane" to "Banana",
+            "peperoni" to "Bell pepper",
+            "carote" to "Carrot",
+            "zucchine" to "Zucchini",
+            "mele verdi" to "Apple",
+            "strawberries" to "Strawberry",
+        ).forEach { (name, expected) -> assertEquals(name, expected, FoodCatalog.find(name)?.name) }
+    }
+
+    @Test fun singularMatchesPluralNamedItems() {
+        mapOf("fungo" to "Mushroom", "uovo" to "Eggs", "lentil" to "Lentils")
+            .forEach { (name, expected) -> assertEquals(name, expected, FoodCatalog.find(name)?.name) }
+    }
+
+    @Test fun exactMatchWins() {
+        assertEquals("Sun-dried tomatoes", FoodCatalog.find("pomodori secchi")?.name)
+        assertEquals("Mushroom", FoodCatalog.find("funghi")?.name)
+        assertEquals("Eggs", FoodCatalog.find("uova")?.name)
+        assertEquals("Tomato", FoodInfo.tidyName("pomodori"))
+    }
+
+    @Test fun inflectionRules() {
+        assertEquals("fungo", FoodInfo.inflectionVariants("funghi").first())
+        assertEquals("albicocca", FoodInfo.inflectionVariants("albicocche").first())
+        assertEquals("pomodoro", FoodInfo.inflectionVariants("pomodori").first())
+        assertEquals("pera", FoodInfo.inflectionVariants("pere").first())
+    }
+
+    @Test fun noFalsePositives() {
+        assertNull(FoodCatalog.find("tavoli"))
+        assertNull(FoodCatalog.find("sedie"))
+        assertEquals(emptyList<String>(), FoodInfo.inflectionVariants("ali"))
+        assertEquals("Sci", FoodInfo.tidyName("sci"))
     }
 }
