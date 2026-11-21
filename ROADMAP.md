@@ -49,7 +49,8 @@ None of these are started; there's no partial branch or scaffolding for them.
 - [x] Modifica della lista dal computer: `tools/pantry.py` (list/add/remove) sul D1 condiviso; l'app sincronizza da sola
 - [ ] Stagionalità: dove vivi → coltivato vicino o lontano (rimandato: serve un paese in Impostazioni e una tabella di origine per prodotto)
 - [ ] Nome del prodotto in due lingue per prodotti fuori catalogo (serve una colonna nuova in Room + D1 + sync; oggi solo catalogo)
-- [ ] Verificare la tabella stagionale con il calendario Milieu Centraal aggiornato (PDF del 2010 incompleto, tabella arrotondata a mesi)
+- [x] Verificare la tabella stagionale con il calendario Milieu Centraal aggiornato (PDF del 2010 incompleto, tabella arrotondata a mesi)
+  - restano non verificabili: patata (assente dal calendario, lasciata tutto l'anno) e frutti di bosco (gruppo misto, nessuna etichetta)
 - [ ] Icone: oggi sono emoji nel catalogo (nessun set di icone nel repo); icona del launcher da ridisegnare solo se Alessio ne indica una
 - [ ] Categorie e catalogo dal server invece che nel codice: oggi `Categories.SUGGESTED` e `FoodCatalog` (categoria, icona, durata, alias di ogni alimento) sono scritti nell'APK, quindi una categoria nuova o un alimento spostato richiede un aggiornamento dell'app. Le modifiche ai prodotti nel D1 arrivano già col sync; l'obiettivo è che basti un sync anche per categorie e catalogo (es. tabelle `categories`/`catalog` nel D1 scaricate dal Worker, con il catalogo nell'APK come fallback offline)
 
@@ -64,6 +65,7 @@ This file collects ideas that are not implemented yet, things left half-done, an
 explicit "not doing this" decisions with their reasoning — so a future session
 (human or Claude Code) doesn't have to rediscover the context.
 
+- 2026-11-21: stagionalità verificata sul calendario Milieu Centraal (PDF "Groente- en fruitkalender" linkato da milieucentraal.nl/eten-en-drinken/milieubewust-eten/groente-en-fruit/, dic 2023, dati Velt/Bionext; il vecchio sito groentefruit.milieucentraal.nl non risponde più). Regola: mese in stagione = prodotto elencato nella colonna di quel mese (coltivato nei Paesi Bassi, import escluso). 10 prodotti su 17 corretti (es. pomodoro 5-10 → 6-10, fragola 5-9 → 4-8, cetriolo 5-10 → 7-10, porro 1-4+7-12 → tutto l'anno, cavolfiore 6-11 → 3-11, mais 8-10 → 8-9), aggiunti indivia e finocchio; patata non verificabile.
 ### Left half-done / worth double-checking
 
 - The app now syncs with the backend (`network/SyncRepository.kt`, Settings →
@@ -139,7 +141,7 @@ in a shared database. **This does not fit Pantry and is not planned:**
   as a plan to build one soon.
 
 ## Log
-- 2026-11-21: 🤖 aggiunta suite di test automatici per il Worker di sync (`node:test` + D1 finto su `node:sqlite`, 20 test, nessuna dipendenza) e workflow CI `backend-test.yml`; il deploy non parte più per modifiche a test/README/package.json; corretto il bug di sync sugli alimenti non collegati al catalogo (nome grezzo, niente icona): nome e categoria ricollegati al catalogo su ogni riga scaricata e su aggiunta/modifica, con test unitari
+- 2026-11-21: 🤖 verificata la tabella stagionale NL sul calendario Milieu Centraal (10 prodotti corretti, aggiunti indivia e finocchio, fonte e regola citate nel codice, test aggiornati); aggiunta suite di test automatici per il Worker di sync (`node:test` + D1 finto su `node:sqlite`, 20 test, nessuna dipendenza) e workflow CI `backend-test.yml`; il deploy non parte più per modifiche a test/README/package.json; corretto il bug di sync sugli alimenti non collegati al catalogo (nome grezzo, niente icona): nome e categoria ricollegati al catalogo su ogni riga scaricata e su aggiunta/modifica, con test unitari
 - 2026-11-15: aggiunti i pinoli (catalogo + in dispensa)
 - 2026-11-15: etichetta "in season / out of season" sostituita da un bollino colorato (verde / marrone) in alto a destra della scheda
 - 2026-11-15: nomi e categorie di 36 alimenti inseriti a mano sistemati nel database (nomi inglesi del catalogo, maiuscole, categorie sbagliate); lasciati come erano "Baking mix - biscottini rotondi" e il doppione "Ice cream"

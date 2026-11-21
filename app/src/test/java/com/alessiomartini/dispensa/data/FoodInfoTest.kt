@@ -14,6 +14,10 @@ class FoodInfoTest {
     @Test fun season() {
         assertEquals(true, FoodInfo.inSeason("Strawberry", 6))
         assertEquals(false, FoodInfo.inSeason("Fragola", 1))
+        assertEquals(true, FoodInfo.inSeason("Strawberry", 4))
+        assertEquals(false, FoodInfo.inSeason("Tomato", 5))
+        assertEquals(true, FoodInfo.inSeason("Endive", 11))
+        assertEquals(false, FoodInfo.inSeason("Fennel", 2))
         assertNull(FoodInfo.inSeason("Banana", 6))
         assertNull(FoodInfo.inSeason("Milk", 6))
     }
