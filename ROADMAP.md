@@ -142,6 +142,7 @@ in a shared database. **This does not fit Pantry and is not planned:**
   as a plan to build one soon.
 
 ## Log
+- 2026-11-22: 🤖 Deploy Worker workflow now runs only on pushes to main (before, test branches touching backend/ also deployed to production).
 - 2026-11-21: 🤖 catalog matching also for plurals and gender (Italian rules -i/-e/-chi/-ghi/-che/-ghe, uova/uovo, English plurals, also in reverse) only as a fallback after the direct match, with tests; closed PR #8 (superseded by #18), plural matching noted as to do; 🤖 verified the NL seasonal table against the Milieu Centraal calendar (10 products corrected, added chicory and fennel, source and rule cited in the code, tests updated); added an automated test suite for the sync Worker (`node:test` + fake D1 on `node:sqlite`, 20 tests, no dependencies) and the CI workflow `backend-test.yml`; deploy no longer starts for changes to tests/README/package.json; fixed the sync bug on food items not linked to the catalog (raw name, no icon): name and category re-linked to the catalog on every downloaded row and on add/edit, with unit tests; 🤖 ROADMAP translated to English (language rule)
 - 2026-11-15: added pine nuts (catalog + in the pantry)
 - 2026-11-15: "in season / out of season" label replaced by a colored dot (green / brown) at the top right of the card
